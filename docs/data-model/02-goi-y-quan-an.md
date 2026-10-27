@@ -16,8 +16,9 @@ erDiagram
   Account {
     String id PK "do Better Auth quản lý, kèm email"
     String language "vi hoặc en (R28)"
-    String username "không cần duy nhất (R35)"
-    String userTag "do app cấp; username + tag duy nhất (R37)"
+    String displayName "tên tác giả, không cần duy nhất (R78)"
+    String username "duy nhất, chữ thường, chỉ để đăng nhập (R78)"
+    String userTag "do app cấp, duy nhất (R37)"
     Boolean isAdmin "R44"
     Boolean isBlocked "R44"
   }
@@ -45,7 +46,7 @@ erDiagram
     String dishName
     String placeName "ít nhất 3 quán khác nhau mỗi danh sách (R35)"
     String directions "nhập tự do (R36)"
-    String mealSlot "tùy chọn"
+    String[] mealSlots "tùy chọn, chọn được nhiều"
     String notes "tùy chọn"
     Int order
   }

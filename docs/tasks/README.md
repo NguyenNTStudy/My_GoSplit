@@ -12,8 +12,8 @@ Thứ tự làm: chốt requirements (mục 0) → chốt giao diện (mục 1) 
 |---|---|
 | [01-chuan-bi.md](01-chuan-bi.md) | 0. Chốt requirements · 1. Chốt giao diện |
 | [02-nen-tang.md](02-nen-tang.md) | 2. Khởi tạo dự án → 11. Edit lock |
-| [03-tinh-nang.md](03-tinh-nang.md) | 12. Kế hoạch → 21. Job định kỳ |
-| [04-phat-hanh.md](04-phat-hanh.md) | 22. Kiểm thử và phát hành · Sau MVP |
+| [03-tinh-nang.md](03-tinh-nang.md) | 12. Kế hoạch → 22. Job định kỳ |
+| [04-phat-hanh.md](04-phat-hanh.md) | 23. Kiểm thử và phát hành · Sau MVP |
 
 ## Tech stack
 
@@ -23,7 +23,7 @@ Thứ tự làm: chốt requirements (mục 0) → chốt giao diện (mục 1) 
 | Database | PostgreSQL (Neon) |
 | ORM | Prisma |
 | Tìm kiếm không dấu, gần đúng | PostgreSQL `unaccent` + `pg_trgm` |
-| Auth | Better Auth (Google + email magic link) |
+| Auth | Better Auth (Google + email và mật khẩu) |
 | UI | Tailwind CSS + shadcn/ui |
 | Theme | Theme theo plan: CSS variables + hình minh họa |
 | Ảnh preview link | next/og |

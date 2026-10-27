@@ -4,21 +4,22 @@ Các bảng của module [01](../requirements/01-ke-hoach-va-quyen-truy-cap.md),
 
 ```mermaid
 erDiagram
-  Account |o--o{ Plan : "sở hữu"
+  Account ||--o{ Plan : "sở hữu"
   Plan ||--o{ Participant : "có"
-  Participant |o--o| Plan : "là chủ tài khoản của"
+  Participant ||--o| Plan : "là chủ kế hoạch của"
   Plan ||--o{ Activity : "có"
   Plan ||--o{ Stay : "có"
   Plan ||--o{ FoodItem : "có"
   Plan ||--o{ Expense : "có"
   Plan ||--o| PaymentQr : "có tối đa một"
   Plan ||--o{ EmailToken : "có"
-  Participant ||--o{ PaymentInstallment : "đóng theo đợt"
+  Plan ||--o{ Contribution : "có"
+  Participant ||--o{ Contribution : "đóng tiền"
   Participant ||--o{ Expense : "trả tiền"
   Expense ||--|{ ExpenseShare : "chia cho"
   Participant ||--o{ ExpenseShare : "chịu phần"
   Activity |o--o{ Expense : "gắn với"
-  Participant ||--o| PaymentQr : "thu tiền"
+  Participant ||--o| Plan : "là người thu tiền của"
 
   Account {
     String id PK "chi tiết ở 02-goi-y-quan-an.md"
@@ -27,29 +28,27 @@ erDiagram
   Plan {
     String planId PK "10 chữ số ngẫu nhiên (R4)"
     String shareKey UK "khóa trong link chia sẻ (R3)"
-    String name
+    String name "1 đến 50 ký tự, đếm theo NFC (R73)"
     String location
     DateTime startDate "chỉ ngày"
     DateTime endDate "chỉ ngày, không trước startDate (R2)"
     String notes "tùy chọn"
-    String currencyUnit "hiện luôn là $ (R1)"
+    String currency "mã ISO 4217, ví dụ VND (R1, R70, R72)"
     String theme "mã theme, mặc định Gạo ấm (R29)"
     String coverImagePath "tùy chọn, storage riêng tư (R30)"
     Json coverImageCrop "vùng ảnh hiển thị"
-    String ownerType "account hoặc guest"
-    String ownerId FK "Account, tùy chọn"
-    String ownerParticipantId FK "Participant, tùy chọn (R26)"
+    String ownerId FK "Account, bắt buộc (R61)"
+    String ownerParticipantId FK "Participant (R26)"
+    String collectorParticipantId FK "Participant, người thu tiền, mặc định là chủ kế hoạch (R54)"
     String passcodeHash "argon2 (R5)"
     Int passcodeVersion "tăng khi đổi passcode (R11)"
-    String recoveryEmail "tùy chọn (R10)"
-    DateTime recoveryEmailVerifiedAt
     Int failedPasscodeAttempts "R9"
     DateTime passcodeLockedUntil
     DateTime unlockEmailSentAt "tối đa một email mỗi lần khóa"
     String editLockSessionId "R8"
     DateTime editLockExpiresAt
     DateTime createdAt
-    DateTime updatedAt "tính hạn 30 ngày (R24)"
+    DateTime updatedAt
     String summaryStatus "open, locked, final (R59)"
     DateTime summaryStatusChangedAt "lần tạm khóa hoặc chốt gần nhất"
   }
@@ -57,9 +56,9 @@ erDiagram
   EmailToken {
     String id PK
     String planId FK
-    String purpose "verify_email, unlock, reset_passcode"
+    String purpose "unlock (R9)"
     String tokenHash "lưu dạng hash"
-    DateTime expiresAt "đổi passcode: 1 giờ (R11)"
+    DateTime expiresAt
     DateTime usedAt "dùng một lần"
     DateTime createdAt
   }
@@ -69,21 +68,23 @@ erDiagram
     String planId FK
     String displayName
     String status "active hoặc inactive (R13)"
-    Boolean hasPaid "R23"
     DateTime createdAt "thứ tự hiển thị"
   }
 
-  PaymentInstallment {
-    String id PK
-    String participantId FK
-    Int number "đợt 1, đợt 2"
-    Decimal amount "NUMERIC(14,3)"
-    Boolean isPaid
+  Contribution {
+    String contributionId PK
+    String planId FK
+    String participantId FK "người đóng hoặc được trả lại (R75)"
+    String kind "contribution hoặc refund (R23)"
+    Decimal amount "NUMERIC(14,3), lớn hơn 0 (R18)"
+    DateTime dateTime
+    String note "tùy chọn, ví dụ Đợt 1"
+    String batchId "chung cho các khoản ghi cùng lúc (R75)"
+    DateTime createdAt "dùng khi trùng ngày giờ"
   }
 
   PaymentQr {
     String planId PK, FK "mỗi kế hoạch tối đa một QR (R54)"
-    String collectorParticipantId FK "người thu tiền"
     String imagePath "storage riêng tư (R57)"
     String label "tùy chọn, ví dụ tên ngân hàng"
     DateTime updatedAt "hiển thị trong tổng kết (R56)"
@@ -134,12 +135,11 @@ erDiagram
   FoodItem {
     String foodItemId PK
     String planId FK
-    DateTime date "tùy chọn, trống nếu chưa xếp ngày (R33)"
-    String mealSlot "morning, afternoon, evening; có thể trống"
+    String[] mealSlots "morning, afternoon, evening; chọn được nhiều, có thể trống (R33)"
     String dishName
     String placeName "tùy chọn"
     String directions "tùy chọn, nhập tự do"
     String notes "tùy chọn"
-    Int order "thứ tự giữa các món cùng ngày, cùng buổi"
+    Int order "thứ tự do người dùng sắp xếp"
   }
 ```
