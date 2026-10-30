@@ -1,6 +1,6 @@
 # 01 — Kế hoạch và quyền truy cập
 
-Đăng nhập của người tạo kế hoạch; tạo và quản lý kế hoạch, link chia sẻ, passcode chỉnh sửa, edit lock và xóa kế hoạch.
+Đăng nhập của người tạo kế hoạch; tạo và quản lý kế hoạch, link chia sẻ, passcode chỉnh sửa, thành viên và link mời, edit lock và xóa kế hoạch.
 
 Liên quan: [02 Người tham gia, chi phí và tổng kết](02-nguoi-tham-gia-va-chi-phi.md) · [06 Bảo vệ dữ liệu và chống crawl](06-bao-mat-du-lieu.md) · [Tổng quan](README.md)
 
@@ -13,7 +13,7 @@ Liên quan: [02 Người tham gia, chi phí và tổng kết](02-nguoi-tham-gia-
 - `name`: tên kế hoạch, từ 1 đến 50 ký tự (R73).
 - `location`: điểm đến của chuyến đi; nếu đi qua nhiều nơi thì ghi ngắn gọn, ví dụ `Đà Lạt – Nha Trang`.
 - `startDate`: ngày bắt đầu chuyến đi.
-- `endDate`: ngày kết thúc chuyến đi.
+- `endDate`: ngày kết thúc chuyến đi; kế hoạch dài tối đa 60 ngày (R2).
 - `notes`: ghi chú kế hoạch (tùy chọn).
 - `currency`: mã tiền tệ của kế hoạch theo ISO 4217, ví dụ `VND`, `USD`; chọn khi tạo kế hoạch ([R1](02-nguoi-tham-gia-va-chi-phi.md), [R70](02-nguoi-tham-gia-va-chi-phi.md)), đổi được khi chưa có khoản chi phí ([R72](02-nguoi-tham-gia-va-chi-phi.md)).
 - `theme`: theme của kế hoạch, chọn khi tạo kế hoạch; mặc định là Gạo ấm.
@@ -40,12 +40,29 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - `isAdmin`: tài khoản có phải admin hay không ([R44](04-goi-y-quan-an.md)).
 - `isBlocked`: tài khoản có bị admin khóa hay không ([R44](04-goi-y-quan-an.md)).
 
+### Thành viên
+
+Tài khoản có quyền trên kế hoạch (R84):
+
+- `accountId`: tài khoản.
+- `role`: Chủ, Sửa hoặc Xem.
+- `participantId`: người tham gia gắn với tài khoản trong kế hoạch.
+- `createdAt`: thời điểm tham gia.
+
+### Link mời
+
+- `participantId`: người tham gia được mời (R85).
+- `role`: Sửa hoặc Xem.
+- `token`: mã ngẫu nhiên dài trong link, chỉ lưu dạng hash.
+- `expiresAt`: hết hạn sau 7 ngày.
+- `usedAt`: thời điểm được dùng; mỗi link chỉ dùng một lần.
+
 ## Quy tắc
 
-- **R2.** Không thể lưu kế hoạch nếu ngày kết thúc sớm hơn ngày bắt đầu. Người dùng có thể chỉnh sửa ngày, nhưng khoảng thời gian không hợp lệ phải được sửa trước khi lưu.
-- **R3.** Có thể xem kế hoạch qua đường link chia sẻ mà không cần xác thực hay passcode. Link chứa `planId` và một khóa chia sẻ ngẫu nhiên dài; cần cả hai mới mở được kế hoạch, nên không thể mở kế hoạch bằng cách đoán hoặc chỉ gõ `planId`. Sai mã hay sai khóa đều nhận cùng một thông báo "Không tìm thấy kế hoạch". Chủ kế hoạch cũng mở được kế hoạch từ danh sách kế hoạch của mình. Người có quyền chỉnh sửa có thể đổi khóa chia sẻ; link cũ khi đó không dùng được nữa, thiết bị đang có quyền chỉnh sửa và chủ kế hoạch được chuyển sang link mới, còn những người khác cần nhận link mới.
+- **R2.** Không thể lưu kế hoạch nếu ngày kết thúc sớm hơn ngày bắt đầu, hoặc nếu kế hoạch dài hơn 60 ngày (tính cả ngày đi và ngày về). Ô ngày về không cho chọn quá 60 ngày kể từ ngày đi, và ô ngày có dòng nhắc "Tối đa 60 ngày". Người dùng có thể chỉnh sửa ngày, nhưng khoảng thời gian không hợp lệ phải được sửa trước khi lưu; server kiểm tra lại cả hai điều kiện.
+- **R3.** Có thể xem kế hoạch qua đường link chia sẻ mà không cần xác thực hay passcode. Link chứa `planId` và một khóa chia sẻ ngẫu nhiên dài; cần cả hai mới mở được kế hoạch, nên không thể mở kế hoạch bằng cách đoán hoặc chỉ gõ `planId`. Sai mã hay sai khóa đều nhận cùng một thông báo "Không tìm thấy kế hoạch". Chủ kế hoạch và thành viên (R84) cũng mở được kế hoạch từ danh sách kế hoạch của mình. Người có quyền chỉnh sửa có thể đổi khóa chia sẻ; link cũ khi đó không dùng được nữa, thiết bị đang có quyền chỉnh sửa và chủ kế hoạch được chuyển sang link mới, còn những người khác cần nhận link mới.
 - **R4.** `planId` là số 10 chữ số được sinh ngẫu nhiên, không sinh tuần tự. Nếu mã sinh ra đã tồn tại thì sinh mã mới.
-- **R5.** Mỗi kế hoạch có một passcode chỉnh sửa gồm 6 chữ số, do người dùng tự đặt khi tạo kế hoạch. Ai có passcode hợp lệ cũng chỉnh sửa được kế hoạch. Không cần passcode để xem.
+- **R5.** Mỗi kế hoạch có một passcode chỉnh sửa gồm 6 chữ số, do người dùng tự đặt khi tạo kế hoạch. Ai có passcode hợp lệ cũng chỉnh sửa được kế hoạch; thành viên có quyền Sửa chỉnh sửa được mà không cần passcode (R84). Không cần passcode để xem.
 - **R6.** Nếu passcode được chọn quá dễ đoán (ví dụ: `123456`, `000000` hoặc `111111`), ứng dụng hiển thị cảnh báo nhưng vẫn chấp nhận.
 - **R7.** Chủ kế hoạch chỉnh sửa được mà không cần nhập passcode và là người duy nhất được xóa kế hoạch. Người chỉnh sửa bằng passcode không xóa được kế hoạch.
 - **R8.** Tại một thời điểm chỉ một người được chỉnh sửa kế hoạch. Người đầu tiên vào chế độ chỉnh sửa sẽ giữ edit lock của kế hoạch; những người khác chỉ xem được kế hoạch, kèm thông báo đang có người chỉnh sửa. Lock được nhả khi người chỉnh sửa thoát chế độ chỉnh sửa hoặc sau 5 phút không thao tác. Thao tác lưu sau khi lock của người chỉnh sửa đã hết hạn sẽ bị từ chối, thay vì ghi đè âm thầm lên thay đổi khác.
@@ -54,11 +71,14 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - **R11.** Chỉ chủ kế hoạch được đổi passcode, ngay trong phần cài đặt của kế hoạch khi đã đăng nhập, không cần link qua email. Passcode được lưu dạng mã hóa nên không xem lại được; người chỉnh sửa quên passcode thì hỏi chủ kế hoạch, và chủ kế hoạch đặt passcode mới nếu cần. Sau khi đổi, các thiết bị dùng passcode cũ mất quyền chỉnh sửa, và khóa nhập passcode (R9, nếu có) được gỡ.
 - **R22.** Xóa kế hoạch cần xác nhận vì thao tác này sẽ xóa kế hoạch cùng với lịch trình, người tham gia và các khoản chi phí liên quan.
 - **R24.** Kế hoạch không tự hết hạn; kế hoạch chỉ bị xóa khi chủ kế hoạch xóa (R22).
-- **R60.** Các danh sách có ngày giờ hiển thị từ trên xuống dưới theo thời gian tăng dần, từ quá khứ đến tương lai: danh sách kế hoạch theo ngày bắt đầu (riêng mục Đã tổng kết xếp chuyến mới nhất lên trước, R62), hoạt động trong lịch trình theo ngày giờ dự kiến, nơi ở theo ngày nhận phòng, và khoản chi phí theo ngày giờ phát sinh. Kế hoạch chỉ có ngày, chọn bằng bộ chọn ngày; ngày giờ dự kiến của hoạt động và ngày giờ của khoản chi phí được chọn bằng bộ chọn ngày giờ. Hai mục cùng ngày giờ thì mục được tạo trước hiển thị trước; riêng hoạt động cùng giờ thì theo thứ tự người dùng sắp xếp. Lịch trình và danh sách khoản chi phí có bộ chọn xem "Tất cả" hoặc từng ngày của chuyến đi, mặc định là "Tất cả"; danh sách món ăn không gắn với ngày và lọc theo buổi ([R33](03-lich-trinh-noi-o-mon-an.md)). Khoản chi phí có ngày nằm ngoài khoảng ngày của kế hoạch chỉ hiện ở "Tất cả", và vẫn được tính vào tổng kết.
+- **R60.** Các danh sách có ngày giờ hiển thị từ trên xuống dưới theo thời gian tăng dần, từ quá khứ đến tương lai: danh sách kế hoạch theo ngày bắt đầu (riêng mục Đã tổng kết xếp chuyến mới nhất lên trước, R62), hoạt động trong lịch trình theo ngày rồi theo giờ dự kiến, hoạt động không có giờ nằm cuối ngày, nơi ở theo ngày nhận phòng, và khoản chi phí theo ngày giờ phát sinh. Kế hoạch chỉ có ngày, chọn bằng bộ chọn ngày; hoạt động có ngày và giờ dự kiến, giờ bỏ trống được; ngày giờ của khoản chi phí được chọn bằng bộ chọn ngày giờ. Hai mục cùng ngày giờ thì mục được tạo trước hiển thị trước, kể cả hai hoạt động cùng giờ hoặc cùng không có giờ; lịch trình không có sắp xếp tay. Lịch trình và danh sách khoản chi phí có bộ chọn xem "Tất cả" hoặc từng ngày của chuyến đi, mặc định là "Tất cả"; lịch trình có thêm lựa chọn "Chưa xác định" khi có hoạt động chưa xếp ngày ([R81](03-lich-trinh-noi-o-mon-an.md)); danh sách món ăn không gắn với ngày và lọc theo buổi ([R33](03-lich-trinh-noi-o-mon-an.md)). Khoản chi phí có ngày nằm ngoài khoảng ngày của kế hoạch chỉ hiện ở "Tất cả", và vẫn được tính vào tổng kết.
 - **R61.** Người tạo kế hoạch phải đăng nhập, bằng một trong hai cách: đăng nhập bằng tài khoản Google, hoặc đăng ký tài khoản của ứng dụng; tài khoản có tên hiển thị và username (R78). Tài khoản đăng ký bằng email phải xác nhận email qua link trước khi tạo kế hoạch; quên mật khẩu thì đặt lại qua link gửi đến email đó. Nếu cùng một email dùng cả hai cách, hai cách đăng nhập dùng chung một tài khoản. Người xem kế hoạch qua link và người chỉnh sửa bằng passcode không cần đăng nhập.
-- **R62.** Danh sách kế hoạch của chủ kế hoạch chia thành hai mục, theo trạng thái tổng kết ([R59](02-nguoi-tham-gia-va-chi-phi.md)): **Sắp diễn ra** gồm các kế hoạch có tổng kết đang mở hoặc tạm khóa, xếp theo ngày bắt đầu tăng dần (R60); **Đã tổng kết** gồm các kế hoạch có tổng kết đã chốt, xếp theo ngày bắt đầu giảm dần, chuyến mới nhất lên trước. Mục Sắp diễn ra hiển thị trước. Kế hoạch chỉ kết thúc khi tổng kết đã chốt: kế hoạch chuyển sang mục Đã tổng kết ngay khi chốt, còn chuyến đi đã qua ngày kết thúc mà chưa chốt vẫn ở mục Sắp diễn ra, kèm nhãn "Chưa chốt tổng kết". Mục không có kế hoạch nào thì hiển thị một dòng thông báo ngắn.
+- **R62.** Danh sách kế hoạch của một tài khoản gồm các kế hoạch tài khoản đó tạo và các kế hoạch tài khoản đó là thành viên (R84), chia thành hai mục, theo trạng thái tổng kết ([R59](02-nguoi-tham-gia-va-chi-phi.md)): **Sắp diễn ra** gồm các kế hoạch có tổng kết đang mở hoặc tạm khóa, xếp theo ngày bắt đầu tăng dần (R60); **Đã tổng kết** gồm các kế hoạch có tổng kết đã chốt, xếp theo ngày bắt đầu giảm dần, chuyến mới nhất lên trước. Mục Sắp diễn ra hiển thị trước. Kế hoạch chỉ kết thúc khi tổng kết đã chốt: kế hoạch chuyển sang mục Đã tổng kết ngay khi chốt, còn chuyến đi đã qua ngày kết thúc mà chưa chốt vẫn ở mục Sắp diễn ra, kèm nhãn "Chưa chốt tổng kết". Mục không có kế hoạch nào thì hiển thị một dòng thông báo ngắn. Thẻ của kế hoạch đang tham gia có nhãn "Đang tham gia" kèm quyền; phía trên hai mục có bộ lọc Tất cả · Tôi tạo · Đang tham gia. Thẻ của kế hoạch có tin chiêu mộ đang mở hiện số yêu cầu xin đi cùng đang chờ ([R89](08-chieu-mo.md)). Màn hình Kế hoạch có ba tab: Của bạn, Khám phá và Chiêu mộ ([R87](08-chieu-mo.md)).
 - **R73.** Tên kế hoạch dài từ 1 đến 50 ký tự, tính sau khi bỏ khoảng trắng ở đầu và cuối. Ký tự được đếm sau khi chuẩn hóa Unicode (NFC), để một chữ có dấu như `ệ` luôn tính là một ký tự, dù gõ bằng bộ gõ nào. Ô nhập hiện số ký tự còn lại khi gần đến giới hạn, và không tự cắt bớt tên dán vào. Trên thẻ ở danh sách kế hoạch, tên hiện tối đa 2 dòng, dài hơn thì cắt bằng dấu `…`; màn chi tiết kế hoạch hiện tên đầy đủ. Tiêu đề hành trình có cùng giới hạn ([R64](07-chia-se-hanh-trinh.md)).
 - **R78.** Tài khoản có tên hiển thị và username. Tên hiển thị dài 1–40 ký tự, không cần là duy nhất và đổi được bất cứ lúc nào; đây là tên tác giả của danh sách gợi ý và hành trình, kèm huy hiệu tag ([R37](04-goi-y-quan-an.md)), và là tên của người tham gia đại diện chủ kế hoạch khi tạo kế hoạch ([R26](02-nguoi-tham-gia-va-chi-phi.md)). Username dài 3–20 ký tự, gồm chữ thường không dấu, số, dấu chấm và gạch dưới; là duy nhất, không phân biệt hoa thường, và chỉ dùng để đăng nhập: không bao giờ hiển thị cho người khác. Username đổi được trong tài khoản nếu username mới chưa có ai dùng. Khi đăng ký, người dùng nhập tên hiển thị, username, email và mật khẩu; ô username báo ngay khi đã có người dùng. Lần đầu đăng nhập bằng Google, người dùng chọn username, còn tên hiển thị được điền sẵn theo tài khoản Google. Đăng nhập bằng email hoặc username kèm mật khẩu; sai thông tin nào cũng nhận cùng một thông báo, để không lộ email hay username nào đang có tài khoản. Quên mật khẩu thì nhập email hoặc username; link đặt lại luôn được gửi đến email của tài khoản.
+- **R80.** Khi người có quyền chỉnh sửa đổi ngày đi của kế hoạch, ngày về dời theo để giữ số ngày; người dùng vẫn sửa riêng ngày về được. Nếu kế hoạch có hoạt động hoặc nơi ở và tổng kết đang mở, ứng dụng hỏi có dời chúng theo cùng số ngày không (mặc định là có); hoạt động giữ giờ. Hoạt động nằm ngoài khoảng ngày mới hiện ở mục Ngày chưa xác định ([R81](03-lich-trinh-noi-o-mon-an.md)), không bị xóa. Khoản chi phí và tiền đóng giữ nguyên ngày. Sau khi đổi, nơi ở nằm ngoài khoảng ngày mới phải được sửa trước khi lưu ([R31](03-lich-trinh-noi-o-mon-an.md)).
+- **R84.** Thành viên là tài khoản có quyền trên một kế hoạch, gắn với đúng một người tham gia của kế hoạch đó, với vai trò Chủ, Sửa hoặc Xem. Chủ kế hoạch là thành viên vai trò Chủ, gắn với người tham gia đại diện mình ([R26](02-nguoi-tham-gia-va-chi-phi.md)). Thành viên Sửa chỉnh sửa được mà không cần passcode, với cùng giới hạn như người có passcode: theo edit lock (R8), không xóa kế hoạch, không đổi passcode (R7, R11). Thành viên Xem chỉ xem. Thành viên mở kế hoạch từ danh sách kế hoạch của mình (R62), không cần link chia sẻ, nên đổi khóa chia sẻ (R3) hay đổi passcode (R11) không làm thành viên mất quyền. Passcode và tư cách thành viên độc lập với nhau: tài khoản nhập passcode thì sửa được trên thiết bị đó như mọi người có passcode (R5), nhưng vai trò của tài khoản trong kế hoạch không đổi, và kế hoạch không tự được thêm vào danh sách của tài khoản. Tài khoản trở thành thành viên qua link mời (R85) hoặc khi chủ kế hoạch duyệt yêu cầu xin đi cùng ([R89](08-chieu-mo.md)); chỉ chủ kế hoạch mời, duyệt, đổi vai trò và gỡ thành viên; thành viên tự rời được. Khi thành viên rời hoặc bị gỡ, tài khoản mất quyền, còn người tham gia gắn với họ giữ nguyên. Xóa người tham gia đang gắn với thành viên thì thành viên cũng bị gỡ, sau khi xác nhận ([R13](02-nguoi-tham-gia-va-chi-phi.md)). Trên mọi thiết bị thành viên đăng nhập, "Bạn là ai?" ([R27](02-nguoi-tham-gia-va-chi-phi.md)) dùng người tham gia gắn với tài khoản mà không cần hỏi. Danh sách người tham gia ghi quyền của người có tài khoản, không hiện username hay email (R78).
+- **R85.** Chủ kế hoạch mời một người tham gia dùng tài khoản bằng link mời: chọn một người tham gia đang hoạt động chưa gắn tài khoản và chọn quyền Sửa hoặc Xem; ứng dụng tạo link, chủ kế hoạch tự gửi qua Zalo, Messenger hay cách khác. Ứng dụng không tìm tài khoản theo username hay email (R78). Link dùng một lần và hết hạn sau 7 ngày; mỗi người tham gia chỉ có một link còn hiệu lực, tạo link mới thì link cũ hết hiệu lực, và chủ kế hoạch hủy được link chưa dùng. Người mở link phải đăng nhập (R61); màn hình hiện tên kế hoạch, ngày, người mời, tên người tham gia sẽ gắn và quyền. Bấm "Tham gia kế hoạch" thì tài khoản thành thành viên và kế hoạch hiện trong danh sách của tài khoản; bấm "Không phải tôi" thì không có gì thay đổi và link vẫn còn hiệu lực. Mỗi tài khoản gắn với tối đa một người tham gia trong một kế hoạch. Link đã dùng, hết hạn hoặc đã hủy chỉ hiện "Link mời không còn hiệu lực".
 
 ## Acceptance Criteria
 
@@ -66,7 +86,8 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - Tên kế hoạch rỗng hoặc dài hơn 50 ký tự không lưu được; trên thẻ ở danh sách kế hoạch, tên dài hiện tối đa 2 dòng.
 - Kế hoạch lưu tên, địa điểm, ngày bắt đầu/kết thúc, ghi chú, tiền tệ và các mốc thời gian.
 - Kế hoạch mới được cấp một mã kế hoạch ngẫu nhiên gồm 10 chữ số.
-- Không thể lưu kế hoạch có ngày kết thúc trước ngày bắt đầu; người dùng nhận được thông báo kiểm tra hợp lệ rõ ràng.
+- Không thể lưu kế hoạch có ngày kết thúc trước ngày bắt đầu, hoặc dài hơn 60 ngày; người dùng nhận được thông báo kiểm tra hợp lệ rõ ràng.
+- Đổi ngày đi thì ngày về dời theo; ứng dụng hỏi dời hoạt động và nơi ở theo, giữ giờ; khoản chi phí và tiền đóng giữ nguyên ngày.
 - Người xem có thể mở kế hoạch được chia sẻ mà không cần đăng nhập hay nhập passcode.
 - Không mở được kế hoạch nếu chỉ có `planId` hoặc sai khóa chia sẻ; cả hai trường hợp nhận cùng thông báo "Không tìm thấy kế hoạch".
 - Người có quyền chỉnh sửa có thể đổi link chia sẻ; link cũ không dùng được nữa.
@@ -87,7 +108,10 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - Người dùng đăng nhập được bằng email hoặc username; username không hiển thị cho người khác.
 - Người xem và người chỉnh sửa bằng passcode không cần đăng nhập.
 - Danh sách kế hoạch có hai mục: Sắp diễn ra (tổng kết đang mở hoặc tạm khóa) ở trên, và Đã tổng kết (tổng kết đã chốt) ở dưới, chuyến mới nhất lên trước.
-- Danh sách kế hoạch ở mục Sắp diễn ra, lịch trình, nơi ở và khoản chi phí hiển thị từ trên xuống dưới theo thời gian tăng dần, từ quá khứ đến tương lai.
+- Chủ kế hoạch mời được người tham gia dùng tài khoản bằng link mời, với quyền Sửa hoặc Xem; người nhận đăng nhập, bấm Tham gia và thấy kế hoạch trong danh sách của mình, kèm nhãn Đang tham gia.
+- Thành viên Sửa chỉnh sửa được không cần passcode; thành viên Xem chỉ xem; nhập passcode không đổi quyền của tài khoản.
+- Đổi khóa chia sẻ hoặc passcode không làm thành viên mất quyền; chủ kế hoạch đổi quyền, gỡ thành viên được, và thành viên tự rời được.
+- Danh sách kế hoạch ở mục Sắp diễn ra, lịch trình, nơi ở và khoản chi phí hiển thị từ trên xuống dưới theo thời gian tăng dần, từ quá khứ đến tương lai; hoạt động không có giờ nằm cuối ngày.
 - Lịch trình và danh sách khoản chi phí xem được theo "Tất cả" hoặc theo từng ngày của chuyến đi.
 
 ## Edge Cases
@@ -96,6 +120,9 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - Tên kế hoạch có chữ có dấu được gõ bằng các bộ gõ khác nhau; cùng một tên luôn có cùng số ký tự.
 - Người dùng dán một tên dài hơn 50 ký tự; ô nhập báo vượt giới hạn, không tự cắt âm thầm.
 - Ngày kết thúc sớm hơn ngày bắt đầu trong khi chỉnh sửa.
+- Kế hoạch dài đúng 60 ngày lưu được; 61 ngày bị từ chối. Đổi ngày đi thì ngày về dời theo (R80) nên số ngày không đổi; sửa riêng ngày về vẫn bị giới hạn 60 ngày.
+- Đổi ngày đi của kế hoạch sao chép từ hành trình; hoạt động và nơi ở dời theo, giữ giờ.
+- Đổi ngày đi khi đã có khoản chi phí; khoản chi phí giữ ngày cũ, có thể nằm ngoài khoảng ngày mới và chỉ hiện ở "Tất cả" (R60).
 - Hai người cùng vào chỉnh sửa một kế hoạch gần như cùng lúc; chỉ một người giữ được edit lock, người còn lại chỉ xem được kế hoạch.
 - Người chỉnh sửa đóng tab hoặc mất kết nối mà không thoát chế độ chỉnh sửa; edit lock được nhả sau thời gian không thao tác.
 - Lock của người chỉnh sửa hết hạn trong khi họ còn thay đổi chưa lưu; thao tác lưu bị từ chối kèm thông báo rõ ràng, thay vì ghi đè âm thầm lên thay đổi mới hơn.
@@ -105,6 +132,13 @@ Tài khoản do hệ thống đăng nhập quản lý: đăng nhập bằng Goog
 - Link mở khóa được mở sau khi khóa đã hết hạn hoặc sau khi link đã được dùng.
 - Người chỉnh sửa quên passcode; họ hỏi chủ kế hoạch, và chủ kế hoạch đặt passcode mới nếu cần, vì passcode cũ không xem lại được.
 - Người chỉnh sửa bằng passcode muốn xóa kế hoạch; không có thao tác xóa cho họ.
+- Mở link mời khi chưa đăng nhập; ứng dụng chuyển sang đăng nhập rồi quay lại màn nhận lời mời.
+- Mở link mời đã dùng, hết hạn hoặc đã hủy; hiện "Link mời không còn hiệu lực".
+- Tài khoản đã là thành viên của kế hoạch mở link mời của một người tham gia khác; ứng dụng báo đã là thành viên và không gắn thêm.
+- Chủ kế hoạch mở link mời do chính mình tạo; ứng dụng báo không dùng được cho chính mình.
+- Thành viên Xem nhập passcode trên một thiết bị; sửa được trên thiết bị đó, quyền của tài khoản vẫn là Xem.
+- Thành viên rời kế hoạch khi đã có chi phí; người tham gia của họ giữ nguyên trong chi phí và tổng kết.
+- Chủ kế hoạch xóa kế hoạch; kế hoạch biến khỏi danh sách của mọi thành viên.
 - Mã kế hoạch được sinh ra đã tồn tại; hệ thống sinh mã mới.
 - Có người chỉ gõ `planId` 10 chữ số, hoặc mở link sai khóa; kế hoạch không mở được, và thông báo không cho biết kế hoạch có tồn tại hay không.
 - Khóa chia sẻ bị đổi; người có link cũ không mở được kế hoạch nữa, còn thiết bị đang có quyền chỉnh sửa và chủ kế hoạch được chuyển sang link mới.

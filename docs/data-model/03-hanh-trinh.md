@@ -1,6 +1,6 @@
 # Data model — Chia sẻ hành trình
 
-Các bảng của module [07](../requirements/07-chia-se-hanh-trinh.md). Account và Plan chỉ hiện khóa chính; đủ cột ở [02-goi-y-quan-an.md](02-goi-y-quan-an.md) và [01-ke-hoach.md](01-ke-hoach.md). Hành trình là bản sao độc lập của kế hoạch, nên các mục của nó không liên kết tới Activity, Stay hay FoodItem; kế hoạch sao chép từ hành trình cũng không liên kết ngược lại (R66, R68). Quy tắc xóa và ràng buộc: [README](README.md).
+Các bảng của module [07](../requirements/07-chia-se-hanh-trinh.md). Account và Plan chỉ hiện khóa chính; đủ cột ở [02-goi-y-quan-an.md](02-goi-y-quan-an.md) và [01-ke-hoach.md](01-ke-hoach.md). Hành trình là bản sao độc lập của kế hoạch, nên các mục của nó không liên kết tới Activity, Stay hay FoodItem; kế hoạch nhận bản sao cũng không liên kết ngược lại, ngoài bảng ItineraryCopy dùng để đếm lượt sao chép (R66, R68, R79). Quy tắc xóa và ràng buộc: [README](README.md).
 
 ```mermaid
 erDiagram
@@ -9,10 +9,12 @@ erDiagram
   Itinerary ||--|{ ItineraryActivity : "gồm"
   Itinerary ||--o{ ItineraryStay : "gồm"
   Itinerary ||--o{ ItineraryFood : "gồm"
-  Itinerary ||--o{ ItineraryVote : "được bấm hữu ích"
-  Account ||--o{ ItineraryVote : "bấm hữu ích"
+  Itinerary ||--o{ ItineraryHeart : "được thả tim"
+  Account ||--o{ ItineraryHeart : "thả tim"
   Itinerary ||--o{ ItineraryReport : "bị báo cáo"
   Account |o--o{ ItineraryReport : "báo cáo"
+  Itinerary ||--o{ ItineraryCopy : "được sao chép vào"
+  Plan ||--o{ ItineraryCopy : "nhận bản sao"
 
   Itinerary {
     String itineraryId PK
@@ -29,8 +31,8 @@ erDiagram
     Decimal estimatedCostPerPerson "tùy chọn (R65)"
     String currency "mã ISO 4217, theo plan gốc (R1)"
     String status "published, hidden (do báo cáo), removed (admin gỡ)"
-    Int helpfulCount "R69"
-    Int copyCount "lượt sao chép (R68)"
+    Int heartCount "R69"
+    Int copyCount "số kế hoạch đã nhận bản sao (R68, R79)"
     DateTime createdAt
     DateTime updatedAt "Cập nhật lần cuối (R66)"
   }
@@ -39,12 +41,11 @@ erDiagram
     String itemId PK
     String itineraryId FK
     Int day "1 đến dayCount (R64)"
-    String time "giờ dự kiến"
+    String time "giờ dự kiến, tùy chọn"
     String name
-    String location
+    String location "tùy chọn"
     String mapLink "tùy chọn"
     String notes "tùy chọn"
-    Int order
   }
 
   ItineraryStay {
@@ -71,7 +72,7 @@ erDiagram
     Int order
   }
 
-  ItineraryVote {
+  ItineraryHeart {
     String itineraryId PK, FK
     String accountId PK, FK
     DateTime createdAt
@@ -83,6 +84,12 @@ erDiagram
     String reason "ads, wrong_info, personal_info, inappropriate"
     String reporterAccountId FK "Account, tùy chọn"
     String reporterIpHash "khi chưa đăng nhập; xóa sau 30 ngày (R53)"
+    DateTime createdAt
+  }
+
+  ItineraryCopy {
+    String itineraryId PK, FK
+    String planId PK, FK "mỗi kế hoạch tính một lượt (R68, R79)"
     DateTime createdAt
   }
 

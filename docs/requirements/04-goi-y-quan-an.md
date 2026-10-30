@@ -6,8 +6,7 @@ Liên quan: [03 Lịch trình, nơi ở và danh sách món ăn](03-lich-trinh-n
 
 ## Vị trí trong ứng dụng
 
-- **Lựa chọn "Quán ăn" trong mục "Khám phá"** ở màn hình chính, bên cạnh mục "Kế hoạch"; mục Khám phá còn có lựa chọn "Hành trình" ([07](07-chia-se-hanh-trinh.md)). Nhờ vậy người dùng tìm được quán ăn cả khi chưa tạo kế hoạch.
-- **Trong kế hoạch:** lựa chọn "Gợi ý quán" bên trong tab "Ăn gì", hiện sẵn các khu vực nơi ở của kế hoạch.
+- **Trong kế hoạch:** Khám phá ở tab "Ăn gì" chỉ gợi ý món ăn: danh sách gợi ý và danh sách món ăn của các hành trình, gộp chung ([R79](07-chia-se-hanh-trinh.md)), hiện sẵn các khu vực nơi ở của kế hoạch. Khám phá ở màn hình Kế hoạch chỉ gợi ý cả kế hoạch, nên không có danh sách gợi ý ([07](07-chia-se-hanh-trinh.md)).
 
 ## Ai được làm gì
 
@@ -15,7 +14,7 @@ Liên quan: [03 Lịch trình, nơi ở và danh sách món ăn](03-lich-trinh-n
 |---|---|
 | Tìm và xem danh sách | Mọi người, kể cả chưa đăng nhập |
 | Áp dụng vào kế hoạch | Người có quyền chỉnh sửa kế hoạch đó |
-| Đăng danh sách, bấm "Hữu ích" | Người đã đăng nhập |
+| Đăng danh sách, thả tim | Người đã đăng nhập |
 | Báo cáo | Mọi người, có rate limit theo IP |
 
 Lý do bắt buộc đăng nhập mới được đăng: để biết ai đăng khi cần xử lý spam hay quảng cáo, và để tác giả sửa hoặc gỡ danh sách về sau.
@@ -33,7 +32,7 @@ Lý do bắt buộc đăng nhập mới được đăng: để biết ai đăng 
 - `language`: ngôn ngữ viết danh sách gợi ý.
 - `isLocal`: tác giả có đánh dấu "Tôi sống ở đây" hay không.
 - `status`: đang hiển thị, bị ẩn do báo cáo, hoặc bị admin gỡ (R44).
-- `helpfulCount`: số lượt "Hữu ích".
+- `heartCount`: số tim (R42).
 - `applyCount`: lượt sử dụng: số kế hoạch đã áp dụng danh sách gợi ý (R41).
 - `createdAt`: ngày giờ tạo.
 - `updatedAt`: ngày giờ cập nhật gần nhất; hiển thị là "Cập nhật lần cuối".
@@ -58,10 +57,10 @@ Ví dụ một mục:
 | Buổi phù hợp | Không | Sáng, chiều |
 | Ghi chú | Không | Khoảng 30.000đ/phần, mở 6h–10h |
 
-### Lượt hữu ích
+### Tim
 
-- `guideId`: danh sách gợi ý được đánh dấu hữu ích.
-- `accountId`: tài khoản đánh dấu; mỗi tài khoản một lượt cho mỗi danh sách gợi ý.
+- `guideId`: danh sách gợi ý được thả tim.
+- `accountId`: tài khoản thả tim; mỗi tài khoản một tim cho mỗi danh sách gợi ý.
 
 ### Báo cáo
 
@@ -78,12 +77,13 @@ Ví dụ một mục:
 - **R37.** Danh sách gợi ý hiển thị tên hiển thị của tác giả ([R78](01-ke-hoach-va-quyen-truy-cap.md)), kèm một huy hiệu tag ở cuối do ứng dụng cấp cho tài khoản (ví dụ `Thảo` `#4821`), để phân biệt các tác giả trùng tên. Username đăng nhập không bao giờ được hiển thị. Khi đăng, tác giả có thể đánh dấu "Tôi sống ở đây"; danh sách gợi ý khi đó có huy hiệu Người địa phương. Huy hiệu do tác giả tự khai báo, không được xác minh.
 - **R38.** Người đã đăng nhập và có quyền chỉnh sửa một kế hoạch có thể tạo danh sách gợi ý từ danh sách món ăn của kế hoạch đó. Chỉ tên món, tên quán, đường đến quán, buổi và ghi chú được sao chép; tên người tham gia, chi phí và các thông tin khác của kế hoạch không được sao chép. Món chưa có tên quán hoặc đường đến quán phải được bổ sung hoặc bỏ ra trước khi đăng.
 - **R39.** Danh sách gợi ý đã đăng độc lập với kế hoạch: sửa kế hoạch dùng để tạo nó không làm đổi danh sách gợi ý. Tác giả có thể sửa hoặc gỡ danh sách gợi ý bất cứ lúc nào; tác giả gỡ thì danh sách gợi ý bị xóa hẳn. Danh sách gợi ý hiển thị thời điểm cập nhật lần cuối.
-- **R40.** Ai cũng tìm và xem được danh sách gợi ý mà không cần đăng nhập. Tìm theo điểm đến (R34). Trong mỗi kế hoạch, Gợi ý quán ăn là một lựa chọn trong tab Ăn gì, hiện sẵn các khu vực nơi ở của kế hoạch. Kết quả được sắp theo lượt "Hữu ích", lượt sử dụng (R41) và độ mới, và lọc được theo buổi và ngôn ngữ. Danh sách gợi ý bị ẩn hoặc đã gỡ không xuất hiện trong kết quả tìm kiếm.
+- **R40.** Ai xem được một kế hoạch cũng tìm và xem được danh sách gợi ý trong Khám phá của tab Ăn gì, không cần đăng nhập. Tìm theo điểm đến (R34), hiện sẵn các khu vực nơi ở của kế hoạch. Kết quả được sắp theo số tim (R42), lượt sử dụng (R41) và độ mới, và lọc được theo buổi và ngôn ngữ. Danh sách gợi ý bị ẩn hoặc đã gỡ không xuất hiện trong kết quả tìm kiếm.
 - **R41.** Người có quyền chỉnh sửa một kế hoạch có thể áp dụng cả danh sách gợi ý hoặc từng mục vào danh sách món ăn của kế hoạch, và có thể áp dụng nhiều danh sách gợi ý vào cùng một kế hoạch. Các mục được thêm vào danh sách món ăn của kế hoạch, giữ nguyên tên món, quán, đường đến quán và các buổi; khi áp dụng một mục lẻ, người dùng có thể chọn lại các buổi. Món được áp dụng là bản sao độc lập, không còn liên kết với danh sách gợi ý gốc, và trở thành món bình thường của kế hoạch: người có quyền chỉnh sửa có thể sửa, sắp xếp hoặc xóa; danh sách gợi ý bị sửa hoặc bị gỡ sau đó không làm đổi kế hoạch. Mỗi lần một danh sách gợi ý được áp dụng vào một kế hoạch, lượt sử dụng của nó tăng thêm một; áp dụng lại cùng danh sách gợi ý vào cùng kế hoạch thì không tăng thêm. Xóa món đã áp dụng hoặc xóa kế hoạch không làm giảm lượt sử dụng.
-- **R42.** Người đã đăng nhập có thể đánh dấu một danh sách gợi ý là "Hữu ích", tối đa một lần cho mỗi danh sách gợi ý, và có thể bỏ đánh dấu.
+- **R42.** Người đã đăng nhập có thể thả tim cho một danh sách gợi ý: mỗi tài khoản một tim cho mỗi danh sách gợi ý, bấm lại thì bỏ tim. Nút tim kèm số tim có trên thẻ ở danh sách kết quả, ở trang chi tiết và ở trang người dùng (R83). Người chưa đăng nhập bấm tim thì được mời đăng nhập, xong thì tim được thả. Tác giả không thả tim cho bài của mình. Số tim dùng để xếp hạng kết quả (R40).
 - **R43.** Ai cũng báo cáo được danh sách gợi ý, kèm lý do: quảng cáo, sai thông tin, quán đã đóng cửa, hoặc nội dung không phù hợp. Việc báo cáo bị giới hạn theo địa chỉ IP, và mỗi người (một tài khoản, hoặc một địa chỉ IP nếu chưa đăng nhập) chỉ được tính một lần cho mỗi danh sách gợi ý. Danh sách gợi ý bị 3 người khác nhau báo cáo sẽ bị ẩn với mọi người, trừ tác giả và admin, cho đến khi admin xem xét.
-- **R44.** Admin là các tài khoản do người vận hành ứng dụng chỉ định. Trên trang admin, admin xem các danh sách gợi ý bị báo cáo, có thể khôi phục hoặc gỡ, và có thể khóa tài khoản spam. Danh sách bị admin gỡ được giữ lại ở trạng thái đã gỡ để xử lý spam, và không ai ngoài admin thấy được. Tài khoản bị khóa không thể đăng, đánh dấu hữu ích hay báo cáo, và các danh sách gợi ý của tài khoản đó bị ẩn.
+- **R44.** Admin là các tài khoản do người vận hành ứng dụng chỉ định. Trên trang admin, admin xem các danh sách gợi ý bị báo cáo, có thể khôi phục hoặc gỡ, và có thể khóa tài khoản spam. Danh sách bị admin gỡ được giữ lại ở trạng thái đã gỡ để xử lý spam, và không ai ngoài admin thấy được. Tài khoản bị khóa không thể đăng, thả tim hay báo cáo, và các danh sách gợi ý của tài khoản đó bị ẩn.
 - **R45.** Nội dung danh sách gợi ý, tên hiển thị và username được kiểm tra bằng bộ lọc từ ngữ thô tục cơ bản trước khi đăng. Không giới hạn số danh sách gợi ý một tài khoản đăng mỗi ngày.
+- **R83.** Mỗi tài khoản có một trang người dùng công khai. Bấm tên tác giả ở trang chi tiết danh sách gợi ý hoặc hành trình thì mở trang của người đó; người dùng mở trang của mình từ menu tài khoản. Trang hiện tên hiển thị kèm tag (R37), số hành trình, số danh sách gợi ý và tổng số tim nhận được, và hai mục Hành trình | Danh sách gợi ý gồm các bài người đó đã đăng và đang hiển thị, mới nhất trước; mỗi thẻ có nút tim (R42). Trang không hiện username, email, kế hoạch hay thông tin nào khác của tài khoản ([R48](06-bao-mat-du-lieu.md)); địa chỉ trang dùng một mã công khai riêng, không phải mã tài khoản hay username. Ai cũng xem được, không cần đăng nhập; trang không được lập chỉ mục ([R46](06-bao-mat-du-lieu.md)). Tài khoản bị khóa thì trang không mở được. Bài bị ẩn hoặc đã gỡ không hiện, trừ khi tác giả xem trang của chính mình: bài đang bị ẩn do báo cáo hiện kèm nhãn "Đang bị ẩn".
 
 ## Acceptance Criteria
 
@@ -94,7 +94,7 @@ Ví dụ một mục:
 - Link trong đường đến quán bấm vào được.
 - Người dùng có thể tạo danh sách gợi ý từ danh sách món ăn của một kế hoạch, và danh sách gợi ý không chứa tên người tham gia, chi phí hay thông tin khác của kế hoạch.
 - Ai cũng tìm được danh sách gợi ý theo điểm đến mà không cần đăng nhập; tìm `Đà Lạt`, `Da Lat` hay `dalat` đều ra cùng kết quả.
-- Trong kế hoạch, lựa chọn Gợi ý quán trong tab Ăn gì hiện sẵn các khu vực nơi ở của kế hoạch.
+- Trong kế hoạch, lựa chọn Khám phá trong tab Ăn gì hiện sẵn các khu vực nơi ở của kế hoạch.
 - Kết quả sắp xếp được, và lọc được theo buổi và ngôn ngữ; danh sách gợi ý của người tự khai là người địa phương có huy hiệu Người địa phương.
 - Người có quyền chỉnh sửa có thể áp dụng cả danh sách gợi ý hoặc từng mục; mục được áp dụng giữ các buổi của mục, hoặc các buổi người dùng chọn lại.
 - Có thể áp dụng nhiều danh sách gợi ý vào cùng một kế hoạch.
@@ -102,9 +102,10 @@ Ví dụ một mục:
 - Xóa món đã áp dụng hoặc xóa kế hoạch không làm giảm lượt sử dụng của danh sách gợi ý.
 - Món đã áp dụng sửa, sắp xếp và xóa được như mọi món khác.
 - Sửa hoặc gỡ danh sách gợi ý sau khi đã áp dụng không làm đổi kế hoạch.
-- Người đã đăng nhập có thể đánh dấu "Hữu ích" một lần và bỏ đánh dấu.
+- Người đã đăng nhập thả được một tim cho mỗi danh sách gợi ý và bỏ tim được, ngay trên thẻ ở danh sách kết quả hoặc ở trang chi tiết; kết quả xếp theo số tim.
 - Ai cũng báo cáo được danh sách gợi ý kèm lý do; danh sách gợi ý bị 3 người khác nhau báo cáo không còn xuất hiện trong kết quả tìm kiếm cho đến khi admin xem xét.
 - Admin có thể khôi phục hoặc gỡ danh sách gợi ý bị báo cáo, và khóa tài khoản spam.
+- Bấm tên tác giả mở trang người dùng: tên hiển thị kèm tag, số hành trình, số danh sách gợi ý, tổng số tim và các bài đã đăng; không có username hay email.
 
 ## Edge Cases
 
@@ -123,6 +124,10 @@ Ví dụ một mục:
 - Cùng một người báo cáo một danh sách gợi ý nhiều lần; chỉ tính một lần.
 - Tác giả sửa danh sách gợi ý đang bị ẩn; danh sách gợi ý vẫn bị ẩn cho đến khi admin xem xét.
 - Admin khóa một tài khoản; các danh sách gợi ý của tài khoản đó không còn xuất hiện trong kết quả tìm kiếm, các món đã áp dụng vào kế hoạch giữ nguyên.
+- Người chưa đăng nhập bấm tim; ứng dụng mời đăng nhập, xong thì quay lại và tim được thả.
+- Tác giả xem bài của chính mình; nút tim chỉ hiện số tim, không bấm được.
+- Mở trang người dùng của tài khoản bị khóa; trang hiện "Không tìm thấy người dùng".
+- Tác giả xem trang của chính mình khi có bài đang bị ẩn do báo cáo; bài đó hiện kèm nhãn "Đang bị ẩn", người khác không thấy.
 
 ## Khởi động khi chưa có dữ liệu
 

@@ -6,11 +6,11 @@ Tech stack và thứ tự làm: [README](README.md).
 
 - [ ] Tạo tài khoản dịch vụ: GitHub, Vercel, Neon, Resend, Upstash, Cloudflare (Turnstile)
 - [ ] Mua domain và cấu hình gửi email (SPF, DKIM) cho Resend
-- [ ] Chốt cấu trúc repo: giữ code trong `go-split/` hay đưa lên gốc repo
-- [ ] Tạo project Next.js + TypeScript (đã chạy create-next-app trong `go-split/`, chưa commit)
+- [ ] Chốt cấu trúc repo (đề xuất: giữ code trong `go-split/`, Vercel đặt Root Directory là `go-split`), múi giờ và route ([lộ trình](00-lo-trinh.md))
+- [x] Tạo project Next.js 16 + TypeScript + Tailwind 4 bằng create-next-app trong `go-split/`
 - [ ] Cấu hình ESLint, Prettier
 - [ ] Tạo cấu trúc thư mục, tách logic nghiệp vụ vào `src/domain` (TypeScript thuần, không phụ thuộc Next.js)
-- [ ] Cài Tailwind CSS + shadcn/ui
+- [ ] Cài shadcn/ui (Tailwind 4 đã có)
 - [ ] Cài Prisma, kết nối Neon (dùng pooled connection)
 - [ ] Cài Vitest và Playwright
 - [ ] CI với GitHub Actions: lint, typecheck, test
@@ -18,16 +18,18 @@ Tech stack và thứ tự làm: [README](README.md).
 
 ## 3. Database
 
-- [ ] Prisma schema theo [data model](../data-model/README.md): Plan, Participant, Activity, Expense, ExpenseShare, Contribution, EmailToken
+- [ ] Prisma schema theo [data model](../data-model/README.md): Plan, PlanMember, Participant, Activity, Expense, ExpenseShare, Contribution, EmailToken
+- [ ] Bảng PlanMember (vai trò owner, editor, viewer) và PlanInvite (token lưu dạng hash, dùng một lần, hết hạn 7 ngày); tạo plan thì thêm dòng `owner` gắn với người tham gia của chủ plan, cùng transaction; danh sách plan truy vấn qua PlanMember (R84, R85)
+- [ ] Bảng RecruitPost, JoinRequest, ContactViewLog, RecruitReport, AccountReport, AccountBlock; cột `recruitEmails` của account (R86–R92)
 - [ ] Field `collectorParticipantId` của plan, mặc định là người tham gia đại diện chủ plan; đổi thì xóa QR (R54)
 - [ ] QR chuyển khoản của plan (tối đa một QR mỗi plan, của người thu tiền): đường dẫn ảnh trong storage riêng tư, nhãn, thời điểm cập nhật (R54)
 - [ ] Bảng Stay (nơi ở, có khu vực và mã quốc gia) và FoodItem (món ăn) (R31, R33)
 - [ ] FoodItem: không có `date`; `mealSlots` là mảng buổi (sáng, chiều, tối), có thể trống; `directions` (đường đến quán, nhập tự do) thay cho `mapLink`; không lưu liên kết tới danh sách gợi ý gốc (R33, R41)
-- [ ] Bảng FoodGuide, FoodGuideEntry, GuideVote, GuideReport (R35–R45)
+- [ ] Bảng FoodGuide, FoodGuideEntry, GuideHeart, GuideReport (R35–R45)
 - [ ] Bảng ghi lại danh sách gợi ý nào đã áp dụng vào plan nào, để mỗi plan chỉ tính một lượt sử dụng (R41)
-- [ ] Bảng Itinerary, ItineraryActivity, ItineraryStay, ItineraryFood, ItineraryVote, ItineraryReport; `sourcePlanId` duy nhất, đặt trống khi xóa plan (R63–R69)
+- [ ] Bảng Itinerary, ItineraryActivity, ItineraryStay, ItineraryFood, ItineraryHeart, ItineraryReport, ItineraryCopy (mỗi plan một lượt sao chép); `sourcePlanId` duy nhất, đặt trống khi xóa plan (R63–R69)
 - [ ] Lưu thêm bản không dấu của khu vực (Stay, FoodGuide, Itinerary, ItineraryStay); bật extension `unaccent`, `pg_trgm` và tạo index trigram (R34)
-- [ ] Field ngôn ngữ, `displayName`, `username` (duy nhất, chữ thường), `userTag` (duy nhất), quyền admin và trạng thái bị khóa của account (R28, R37, R44, R78)
+- [ ] Field ngôn ngữ, `displayName`, `username` (duy nhất, chữ thường), `userTag` (duy nhất), `publicId` (ngẫu nhiên, duy nhất, cho địa chỉ trang người dùng), quyền admin và trạng thái bị khóa của account (R28, R37, R44, R78, R83)
 - [ ] Bảng/field cho passcode lock, edit lock và email token của link mở khóa (R9)
 - [ ] Field `currency` (mã ISO 4217) của plan và hành trình; server chỉ nhận mã có trong danh sách tiền tệ, và chỉ cho đổi khi plan chưa có khoản chi, tiền đóng và tổng kết đang mở (R1, R72)
 - [ ] Field `summaryStatus` (`open`, `locked`, `final`) và `summaryStatusChangedAt` của plan; server chặn ghi Participant, Activity, Expense, ExpenseShare khi tổng kết đang `locked` hoặc `final`; không cho đổi khỏi `final` (R59)
@@ -37,7 +39,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Field `shareKey` của plan: chuỗi ngẫu nhiên ít nhất 128 bit, sinh bằng crypto, dạng an toàn cho URL (R3)
 - [ ] Mã định danh ngẫu nhiên (UUID hoặc cuid) cho mọi bảng khác, không dùng số tự tăng (R49)
 - [ ] Lưu số tiền dạng `NUMERIC(14,3)`, tỷ lệ dạng `NUMERIC`
-- [ ] Index: `(ownerId, startDate)`, `(planId, dateTime)` của Expense và Activity, `(planId, order)` của FoodItem, các khóa ngoại `planId` (R33, R60)
+- [ ] Index: `(ownerId, startDate)`, `(planId, dateTime)` của Expense, `(planId, date, time)` của Activity, `(planId, order)` của FoodItem, các khóa ngoại `planId` (R33, R60)
 - [ ] Xóa plan thì xóa cascade toàn bộ dữ liệu con (R22)
 - [ ] Cập nhật `plan.updatedAt` khi bất kỳ dữ liệu con nào thay đổi
 - [ ] Seed data cho môi trường dev
@@ -57,8 +59,11 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Chuẩn hóa khu vực để tìm kiếm: bỏ dấu, chữ thường, `đ` thành `d`, gộp khoảng trắng; dùng chung cho nơi ở, danh sách gợi ý và hành trình (R34)
 - [ ] Đếm số quán khác nhau trong danh sách gợi ý: so tên quán đã chuẩn hóa như khu vực (R35)
 - [ ] Nhận biết mục trùng với món đã có trong plan (cùng món, cùng quán) khi áp dụng danh sách gợi ý (R41)
-- [ ] Tạo hành trình từ plan đã chốt: đổi ngày thật thành số thứ tự ngày, bỏ hoạt động ngoài khoảng ngày, chỉ lấy các field được phép; tính số người và chi phí ước tính mỗi người, làm tròn như R19 (R64, R65)
-- [ ] Sao chép hành trình thành plan mới: đổi số thứ tự ngày thành ngày thật theo ngày bắt đầu, giữ giờ của hoạt động (R68)
+- [ ] Tạo hành trình từ plan đã chốt: đổi ngày thật thành số thứ tự ngày, bỏ hoạt động ở mục Ngày chưa xác định (R81), chỉ lấy các field được phép; tính số người và chi phí ước tính mỗi người, làm tròn như R19 (R64, R65)
+- [ ] Sao chép hành trình thành plan mới: đổi số thứ tự ngày thành ngày thật theo ngày bắt đầu, giữ giờ của hoạt động; ghi ItineraryCopy (R68)
+- [ ] Sao chép hoạt động đã chọn của hành trình vào plan đang có: Ngày N vào ngày thứ N của plan, giữ giờ (kể cả không có giờ); ngày vượt quá plan thì để trống ngày (mục Ngày chưa xác định); không thêm nơi ở; ghi ItineraryCopy nếu plan chưa có (R79, R81)
+- [ ] Thêm món ăn của hành trình vào plan: như áp dụng danh sách gợi ý, nhận biết món trùng (R41, R79)
+- [ ] Đổi ngày đi của plan: ngày về dời theo; nếu đồng ý thì dời hoạt động và nơi ở cùng số ngày, giữ giờ, hoạt động chưa có ngày giữ nguyên; khoản chi và tiền đóng giữ nguyên ngày (R80)
 - [ ] Unit test cho mọi edge case về tính tiền (cả tiền tệ có và không có phần lẻ, tiền đóng, trả lại, người tự trả khoản chi), chọn và tìm tiền tệ, chuẩn hóa khu vực, đếm quán, nhận biết mục trùng, tạo và sao chép hành trình
 
 ## 5. Đa ngôn ngữ
@@ -110,9 +115,10 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Passcode 6 số do người dùng tự đặt, lưu dạng hash (argon2) (R5)
 - [ ] Cảnh báo passcode dễ đoán nhưng vẫn cho lưu (R6)
 - [ ] Phiên edit bằng httpOnly cookie có ký, gắn với `planId` và phiên bản passcode
-- [ ] Phân quyền: xem (ai có link), chỉnh sửa (có passcode hoặc chủ account), xóa (chỉ chủ plan) (R3, R7)
+- [ ] "Bạn là ai?": tìm người tham gia gắn với tài khoản qua PlanMember trước, rồi mới tới lựa chọn lưu trên thiết bị (R26, R27)
+- [ ] Phân quyền: xem (ai có link), chỉnh sửa (có passcode hoặc chủ account), xóa (chỉ chủ plan) (R3, R7); gom vào một hàm trong `src/domain` đọc PlanMember, phiên passcode và khóa chia sẻ, mọi API đều gọi hàm này, có test theo bảng quyền, gồm quyền Sửa và Xem của thành viên; nhập passcode không đổi quyền của tài khoản (R84)
 - [ ] Sai passcode 5 lần liên tiếp thì khóa nhập passcode của plan 12 giờ; thiết bị đã có quyền edit không bị ảnh hưởng (R9)
-- [ ] Quyền admin: chỉ account được chỉ định mới vào được trang admin; account bị khóa không đăng, bấm "Hữu ích" hay báo cáo được (R44)
+- [ ] Quyền admin: chỉ account được chỉ định mới vào được trang admin; account bị khóa không đăng, thả tim hay báo cáo được (R44)
 
 ## 9. Bảo mật dữ liệu và chống crawl
 
@@ -128,6 +134,8 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Tìm kiếm danh sách gợi ý và hành trình: phân trang có giới hạn, không có API xuất hàng loạt, rate limit như trang plan (R52)
 - [ ] Lưu IP dạng hash có salt (R53)
 - [ ] Ảnh QR và ảnh nền riêng lưu ở storage riêng tư, không có URL công khai; trả ảnh qua route của app có kiểm tra `planId` và khóa chia sẻ, header `Cache-Control: private, no-store` (R30, R57)
+- [ ] Mã hóa thông tin liên hệ của yêu cầu xin đi cùng (AES-GCM, khóa trong biến môi trường, không lưu trong database); chỉ API của chủ plan giải mã; ghi ContactViewLog mỗi lần xem (R91)
+- [ ] Trang tin chiêu mộ gắn `noindex`; tìm tin phân trang có giới hạn và rate limit như tìm hành trình (R46, R52)
 
 ## 10. Email và đổi passcode
 
@@ -136,6 +144,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Chủ plan đổi passcode trong cài đặt plan, không cần link email (R11)
 - [ ] Sau khi đổi passcode: vô hiệu phiên edit cũ, gỡ khóa nhập passcode (R11)
 - [ ] Token trong email: dùng một lần, có hạn, lưu dạng hash
+- [ ] Email chiêu mộ: yêu cầu mới cho chủ plan (gộp tối đa một email mỗi giờ), duyệt, từ chối, hết hạn cho người gửi; tắt được trong tài khoản (R90)
 
 ## 11. Edit lock
 

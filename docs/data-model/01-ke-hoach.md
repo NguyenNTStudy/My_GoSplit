@@ -5,6 +5,11 @@ Các bảng của module [01](../requirements/01-ke-hoach-va-quyen-truy-cap.md),
 ```mermaid
 erDiagram
   Account ||--o{ Plan : "sở hữu"
+  Account ||--o{ PlanMember : "là thành viên"
+  Plan ||--|{ PlanMember : "có"
+  PlanMember |o--|| Participant : "gắn với"
+  Plan ||--o{ PlanInvite : "có link mời"
+  Participant ||--o{ PlanInvite : "được mời"
   Plan ||--o{ Participant : "có"
   Participant ||--o| Plan : "là chủ kế hoạch của"
   Plan ||--o{ Activity : "có"
@@ -31,7 +36,7 @@ erDiagram
     String name "1 đến 50 ký tự, đếm theo NFC (R73)"
     String location
     DateTime startDate "chỉ ngày"
-    DateTime endDate "chỉ ngày, không trước startDate (R2)"
+    DateTime endDate "chỉ ngày, không trước startDate, tối đa 60 ngày (R2)"
     String notes "tùy chọn"
     String currency "mã ISO 4217, ví dụ VND (R1, R70, R72)"
     String theme "mã theme, mặc định Gạo ấm (R29)"
@@ -51,6 +56,28 @@ erDiagram
     DateTime updatedAt
     String summaryStatus "open, locked, final (R59)"
     DateTime summaryStatusChangedAt "lần tạm khóa hoặc chốt gần nhất"
+  }
+
+  PlanMember {
+    String planId PK, FK
+    String accountId PK, FK
+    String role "owner, editor, viewer (R84)"
+    String participantId FK, UK "người tham gia của tài khoản trong kế hoạch"
+    String joinedVia "created, invite (R85) hoặc request (R89)"
+    DateTime createdAt
+  }
+
+  PlanInvite {
+    String inviteId PK
+    String planId FK
+    String participantId FK "người tham gia được mời (R85)"
+    String role "editor hoặc viewer"
+    String tokenHash UK "mã trong link, lưu dạng hash"
+    DateTime expiresAt "7 ngày"
+    DateTime usedAt "dùng một lần"
+    String usedByAccountId FK "tùy chọn"
+    DateTime revokedAt "chủ kế hoạch hủy, hoặc có link mới"
+    DateTime createdAt
   }
 
   EmailToken {
@@ -112,11 +139,12 @@ erDiagram
     String activityId PK
     String planId FK
     String name
-    DateTime dateTime "ngày giờ dự kiến (R60)"
-    String location
+    DateTime date "chỉ ngày, tùy chọn; trống là Ngày chưa xác định (R81)"
+    String time "giờ dự kiến HH:mm, tùy chọn; trống thì nằm cuối ngày (R60)"
+    String location "tùy chọn"
     String mapLink "tùy chọn"
     String notes "tùy chọn"
-    Int order "thứ tự giữa các hoạt động cùng giờ (R60)"
+    DateTime createdAt "dùng khi trùng giờ hoặc cùng không có giờ (R60)"
   }
 
   Stay {

@@ -2,7 +2,7 @@
 
 Danh sách công việc để xây dựng MVP theo [requirements](../requirements/README.md). Mã trong ngoặc như (R19) là mã quy tắc nghiệp vụ trong requirements.
 
-Thứ tự làm: chốt requirements (mục 0) → chốt giao diện (mục 1) → code (từ mục 2).
+Thứ tự làm: chốt requirements (mục 0) → chốt giao diện (mục 1) → code (từ mục 2) theo các giai đoạn trong [lộ trình](00-lo-trinh.md).
 
 Đánh dấu hoàn thành bằng cách đổi `- [ ]` thành `- [x]`.
 
@@ -10,16 +10,17 @@ Thứ tự làm: chốt requirements (mục 0) → chốt giao diện (mục 1) 
 
 | File | Mục |
 |---|---|
+| [00-lo-trinh.md](00-lo-trinh.md) | Lộ trình code: giai đoạn, tuần đầu, cấu trúc thư mục, route, quy ước |
 | [01-chuan-bi.md](01-chuan-bi.md) | 0. Chốt requirements · 1. Chốt giao diện |
 | [02-nen-tang.md](02-nen-tang.md) | 2. Khởi tạo dự án → 11. Edit lock |
-| [03-tinh-nang.md](03-tinh-nang.md) | 12. Kế hoạch → 22. Job định kỳ |
-| [04-phat-hanh.md](04-phat-hanh.md) | 23. Kiểm thử và phát hành · Sau MVP |
+| [03-tinh-nang.md](03-tinh-nang.md) | 12. Kế hoạch → 23. Job định kỳ |
+| [04-phat-hanh.md](04-phat-hanh.md) | 24. Kiểm thử và phát hành · Sau MVP |
 
 ## Tech stack
 
 | Phần | Lựa chọn |
 |---|---|
-| Framework | Next.js (App Router) + TypeScript |
+| Framework | Next.js 16 (App Router) + TypeScript, Node 24 |
 | Database | PostgreSQL (Neon) |
 | ORM | Prisma |
 | Tìm kiếm không dấu, gần đúng | PostgreSQL `unaccent` + `pg_trgm` |

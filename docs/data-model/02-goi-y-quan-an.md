@@ -6,8 +6,8 @@ Các bảng của module [04](../requirements/04-goi-y-quan-an.md), cùng các c
 erDiagram
   Account ||--o{ FoodGuide : "đăng"
   FoodGuide ||--|{ FoodGuideEntry : "gồm"
-  FoodGuide ||--o{ GuideVote : "được bấm hữu ích"
-  Account ||--o{ GuideVote : "bấm hữu ích"
+  FoodGuide ||--o{ GuideHeart : "được thả tim"
+  Account ||--o{ GuideHeart : "thả tim"
   FoodGuide ||--o{ GuideReport : "bị báo cáo"
   Account |o--o{ GuideReport : "báo cáo"
   FoodGuide ||--o{ GuideApplication : "được áp dụng"
@@ -19,6 +19,7 @@ erDiagram
     String displayName "tên tác giả, không cần duy nhất (R78)"
     String username "duy nhất, chữ thường, chỉ để đăng nhập (R78)"
     String userTag "do app cấp, duy nhất (R37)"
+    String publicId "ngẫu nhiên, duy nhất; địa chỉ trang người dùng (R83)"
     Boolean isAdmin "R44"
     Boolean isBlocked "R44"
   }
@@ -34,7 +35,7 @@ erDiagram
     String language "ngôn ngữ viết"
     Boolean isLocal "Tôi sống ở đây (R37)"
     String status "published, hidden (do báo cáo), removed (admin gỡ)"
-    Int helpfulCount "R42"
+    Int heartCount "R42"
     Int applyCount "lượt sử dụng (R41)"
     DateTime createdAt
     DateTime updatedAt "Cập nhật lần cuối (R39)"
@@ -51,7 +52,7 @@ erDiagram
     Int order
   }
 
-  GuideVote {
+  GuideHeart {
     String guideId PK, FK
     String accountId PK, FK
     DateTime createdAt

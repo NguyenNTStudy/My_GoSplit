@@ -12,7 +12,11 @@ Tech stack và thứ tự làm: [README](README.md).
 - [x] Khóa nhập passcode theo plan, không giới hạn theo IP (R9)
 - [x] Người tạo plan bắt buộc đăng nhập (Google hoặc email + mật khẩu); bỏ plan không có tài khoản, email khôi phục riêng và tự xóa sau 30 ngày; chủ plan tự đổi passcode trong cài đặt (R7, R9–R11, R24, R61)
 - [x] Danh sách plan chia hai mục: Sắp diễn ra (tổng kết đang mở hoặc tạm khóa) và Đã tổng kết (đã chốt, mới nhất lên trước); plan chỉ kết thúc khi đã chốt tổng kết (R62)
-- [x] Đưa Chia sẻ hành trình vào MVP: chủ plan chia sẻ plan đã chốt lên mục Khám phá (lịch trình theo Ngày 1…N, nơi ở, món ăn, chi phí ước tính mỗi người; không có người tham gia, khoản chi, QR, ngày thật); ai cũng tìm, xem được; người đã đăng nhập sao chép thành plan mới (R63–R69)
+- [x] Đưa Chia sẻ hành trình vào MVP: chủ plan chia sẻ plan đã chốt lên Khám phá (lịch trình theo Ngày 1…N, nơi ở, món ăn, chi phí ước tính mỗi người; không có người tham gia, khoản chi, QR, ngày thật); ai cũng tìm, xem được; người đã đăng nhập sao chép thành plan mới (R63–R69)
+- [x] Sao chép toàn bộ hành trình thành plan mới chỉ cần chọn ngày đi và passcode; Khám phá có ở màn hình Kế hoạch (chỉ gợi ý cả kế hoạch), tab Lịch trình (chỉ lịch trình) và tab Ăn gì (chỉ món ăn: danh sách gợi ý và món của hành trình, gộp chung), hai tab sau thêm vào plan đang có; đổi ngày đi thì hỏi dời hoạt động và nơi ở (R68, R79, R80)
+- [x] Thêm lịch trình từ Khám phá bằng danh sách chọn theo ngày và hoạt động, giống áp dụng danh sách gợi ý: Ngày N vào ngày N của plan, ngày thừa vào mục Ngày chưa xác định, không thêm nơi ở; chuyển hoạt động sang ngày khác bằng kéo thả hoặc nút "Chuyển" (chọn ngày và giờ) (R79, R81)
+- [x] Chọn ngày của hoạt động bằng một ô dropdown dùng chung cho form hoạt động và hộp thoại Chuyển: danh sách mọi ngày của plan, cuộn dọc, mỗi ngày ghi số hoạt động; thay lưới 3 ô (R82)
+- [x] Giờ của hoạt động là tùy chọn: có giờ xếp theo giờ tăng dần, không có giờ ở cuối ngày, trùng giờ thì cái tạo trước lên trước; bỏ kéo đổi thứ tự trong ngày (R60, R81)
 - [x] Ghi tiền đóng của từng người (ghi nhanh cùng số tiền hoặc mỗi người một số), thay cho đợt đóng góp và đánh dấu đã thanh toán; tổng kết từng người: chi tiêu, đã đóng, còn thiếu hoặc dư; người thu tiền cấp kế hoạch, mặc định là chủ plan (R23, R54, R75, R76)
 - [x] Tên plan và tiêu đề hành trình 1–50 ký tự, cắt 2 dòng trên thẻ (R73); số tiền tròn nghìn hiện `k` / `K` (R74)
 - [x] Màu trạng thái tiền thống nhất cả app, không theo theme: xanh lá là đủ hoặc dư, đỏ là thiếu; số tiền không kèm chữ (R77)
@@ -32,15 +36,26 @@ Tech stack và thứ tự làm: [README](README.md).
 - [x] Danh sách có ngày giờ hiển thị theo thời gian tăng dần; lịch trình và chi phí xem theo "Tất cả" hoặc từng ngày (R60)
 - [x] Danh sách món ăn không gắn với ngày; mỗi món có một hoặc nhiều buổi (3 biểu tượng sáng, chiều, tối); lọc theo buổi (R33)
 - [x] Plan có 4 tab: Lịch trình, Ăn gì, Chi phí, Tổng kết; người tham gia mở từ số người ở đầu plan
-- [x] Kế hoạch chỉ có ngày; hoạt động có ngày giờ dự kiến; chỉ người có quyền chỉnh sửa được tạm khóa, mở khóa và chốt tổng kết (R59, R60)
+- [x] Kế hoạch dài tối đa 60 ngày, tính cả ngày đi và ngày về (R2)
+- [x] Kế hoạch chỉ có ngày; hoạt động có ngày và giờ dự kiến, giờ tùy chọn; chỉ người có quyền chỉnh sửa được tạm khóa, mở khóa và chốt tổng kết (R59, R60)
 
 ## 1. Chốt giao diện
 
 - [x] Chọn style giao diện: Gạo ấm (style 3 trong [canvas wireframe](https://claude.ai/artifact/6iUe9YoLbxwwiQHG7R47o9))
-- [x] Chốt vị trí Gợi ý quán ăn trong plan: một lựa chọn trong tab "Ăn gì"
-- [ ] Wireframe theo style Gạo ấm cho cả điện thoại và desktop: danh sách plan, tạo plan (kèm chọn tiền tệ), chi tiết plan (lịch trình, người tham gia, chi phí, tổng kết kèm QR chuyển khoản), form chi phí, danh sách và form ghi tiền đóng, đăng nhập (email hoặc username) và đăng ký (tên hiển thị, username), hoàn tất tài khoản khi vào bằng Google, nhập passcode, đổi passcode và tiền tệ trong cài đặt, đổi link chia sẻ, nơi ở, danh sách món ăn (biểu tượng buổi, lọc theo buổi)
-- [ ] Wireframe Gợi ý quán ăn: lựa chọn "Quán ăn" trong mục "Khám phá" ở màn hình chính, lựa chọn "Gợi ý quán" trong tab Ăn gì, tìm theo điểm đến, xem danh sách gợi ý (tên hiển thị kèm huy hiệu tag), đăng danh sách gợi ý, áp dụng vào plan, báo cáo, trang admin
-- [ ] Wireframe Chia sẻ hành trình: lựa chọn "Hành trình" trong mục Khám phá, tìm theo điểm đến, xem hành trình, nút chia sẻ trong tổng kết đã chốt, xem trước và sửa bản đăng, sao chép thành plan mới
+- [x] Chốt vị trí Gợi ý quán ăn trong plan: Khám phá trong tab "Ăn gì", gộp chung với món ăn của hành trình
+- [x] Wireframe điện thoại theo style Gạo ấm: danh sách plan, tạo plan (kèm chọn tiền tệ), chi tiết plan (lịch trình, người tham gia, chi phí, tổng kết kèm QR chuyển khoản), form chi phí, danh sách và form ghi tiền đóng, đăng nhập (email hoặc username) và đăng ký (tên hiển thị, username), hoàn tất tài khoản khi vào bằng Google, nhập passcode, đổi passcode và tiền tệ trong cài đặt, đổi link chia sẻ, danh sách món ăn (biểu tượng buổi, lọc theo buổi)
+- [x] Đổi "Hữu ích" thành tim: mỗi tài khoản một tim cho mỗi hành trình hoặc danh sách gợi ý, dùng để xếp hạng; thả tim ngay trên thẻ (R42, R69)
+- [x] Trang người dùng công khai: tên hiển thị kèm tag, số bài, tổng tim, các bài đã đăng; địa chỉ dùng mã công khai riêng, không lộ username hay mã tài khoản (R83)
+- [x] Thành viên có tài khoản làm trong MVP: chủ plan mời bằng link (quyền Sửa hoặc Xem), danh sách plan có Tôi tạo / Đang tham gia; passcode không đổi quyền của tài khoản (R84, R85)
+- [x] Chiêu mộ bạn đồng hành làm trong MVP: tab Chiêu mộ, tin kèm lịch trình, xin đi cùng kèm liên hệ, chủ plan duyệt; không có chat; chỉ xác minh bằng email (R86–R92)
+- [x] Wireframe thành viên: lọc danh sách plan (G01, GD1), quyền trong màn Người tham gia (G05), link mời (G05b), nhận lời mời (A05)
+- [x] Wireframe chiêu mộ: tab Chiêu mộ (K06, GD18), chi tiết tin (K07), xin đi cùng (K07b), chủ plan duyệt yêu cầu (G05c), đăng tin (G05d), ngừng chiêu mộ và chiêu mộ lại (G05e, G05f), số yêu cầu trên thẻ plan (G01)
+- [x] Wireframe desktop cho mọi màn điện thoại (GD1–GD50): danh sách plan, lịch trình (cột danh sách ngày, thả để chuyển ngày), nơi ở, ăn gì và khám phá món, chi phí, tổng kết (xem QR, chốt, đã chốt), người tham gia (menu từng người, link mời), chiêu mộ của chủ plan (duyệt, ngừng, đăng tin), cài đặt và ảnh nền, tạo plan 3 bước, tài khoản (đăng nhập, đăng ký, quên mật khẩu, hoàn tất, nhận lời mời), Bạn là ai và passcode, khám phá, gợi ý quán, chia sẻ và sao chép hành trình, báo cáo, trang người dùng, admin; form và bước xác nhận là hộp thoại giữa màn hình
+- [x] Wireframe bổ sung: duyệt yêu cầu xin đi cùng có chọn quyền (G05g, GD50), báo cáo người dùng (K05b, GD49), admin có loại Chiêu mộ và Người dùng (GD17), ô mô tả ngắn khi đăng gợi ý (G18), nhắc tối đa 60 ngày khi tạo plan (G02, GD7)
+- [x] Wireframe QR chuyển khoản: bấm vào QR ở Tổng kết thì ảnh hiện lớn, chỉ có nút đóng; tải QR dùng bộ chọn ảnh của hệ thống, không có màn riêng (R54, R56)
+- [x] Wireframe quản lý nơi ở (danh sách, form sửa), báo cáo (dùng chung cho danh sách gợi ý và hành trình), trang admin (desktop), trang người dùng (điện thoại, desktop), nút tim trên thẻ Khám phá
+- [x] Wireframe Gợi ý quán ăn trên điện thoại: Khám phá trong tab Ăn gì, tìm theo điểm đến, xem danh sách gợi ý (tên hiển thị kèm huy hiệu tag), đăng danh sách gợi ý, áp dụng vào plan
+- [x] Wireframe Chia sẻ hành trình trên điện thoại: Khám phá ở màn hình Kế hoạch, tìm theo điểm đến, xem hành trình, nút chia sẻ trong tổng kết đã chốt, xem trước và sửa bản đăng, sao chép thành plan mới (chọn ngày đi), Khám phá trong tab Lịch trình và thêm vào lịch trình
 - [ ] Màn hình kiểm tra chống bot khi vượt giới hạn truy cập
 - [ ] Chốt danh sách theme cho MVP (đề xuất: Gạo ấm, Biển, Núi rừng, Phố cổ, Đêm)
 - [ ] Chuẩn bị hình minh họa cho từng theme (tự vẽ, thuê vẽ hoặc mua từ thư viện có license dùng thương mại)

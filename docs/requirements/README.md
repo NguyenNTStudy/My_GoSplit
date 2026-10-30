@@ -18,7 +18,13 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 - **Tiền đóng**: tiền một người tham gia đưa cho người thu tiền, ví dụ khi cả nhóm đóng trước một phần để chuẩn bị chuyến đi.
 - **Danh sách gợi ý**: danh sách gợi ý quán ăn do người dùng đăng cho một khu vực.
 - **Hành trình**: bản chia sẻ công khai của một kế hoạch đã chốt tổng kết, gồm lịch trình, nơi ở, món ăn và chi phí ước tính mỗi người, không có thông tin của người tham gia.
-- **Khám phá**: mục ở màn hình chính, bên cạnh mục Kế hoạch, gồm hành trình và danh sách gợi ý quán ăn.
+- **Khám phá**: nội dung cộng đồng chia sẻ, có ở ba nơi và mỗi nơi chỉ gợi ý đúng loại của nơi đó: màn hình Kế hoạch gợi ý cả kế hoạch (hành trình), tab Lịch trình gợi ý lịch trình, tab Ăn gì gợi ý món ăn.
+- **Ngày chưa xác định**: mục cuối lịch trình, gồm các hoạt động chưa xếp vào ngày nào của chuyến đi.
+- **Tim**: lượt thích của một tài khoản cho một hành trình hoặc danh sách gợi ý; mỗi tài khoản một tim cho mỗi bài, dùng để xếp hạng.
+- **Trang người dùng**: trang công khai của một tài khoản, gồm các hành trình và danh sách gợi ý người đó đã đăng.
+- **Thành viên**: tài khoản được chủ kế hoạch mời vào kế hoạch, gắn với một người tham gia, có quyền Sửa hoặc Xem.
+- **Chiêu mộ**: tab ở màn hình Kế hoạch liệt kê các kế hoạch đang tìm thêm người đi cùng.
+- **Tin chiêu mộ**: tin chủ kế hoạch đăng để tìm thêm người đi cùng; người khác gửi yêu cầu xin đi cùng kèm thông tin liên hệ.
 - **R1, R2, …**: mã quy tắc nghiệp vụ, đánh số chung cho mọi module.
 
 ## Phạm vi
@@ -33,6 +39,7 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 - Bảo vệ việc chỉnh sửa bằng passcode 6 chữ số. Ai có passcode cũng chỉnh sửa được kế hoạch, không cần mời qua email. Passcode dùng cho việc chỉnh sửa, không dùng cho việc xem.
 - Chủ kế hoạch chỉnh sửa được mà không cần passcode và là người duy nhất được xóa kế hoạch.
 - Tại một thời điểm chỉ một người được chỉnh sửa kế hoạch.
+- Chủ kế hoạch mời người tham gia dùng tài khoản bằng link mời, quyền Sửa hoặc Xem; danh sách kế hoạch gồm kế hoạch mình tạo và kế hoạch đang tham gia.
 - Khóa việc nhập passcode khi nhập sai nhiều lần, và cho phép mở khóa qua email gửi đến chủ kế hoạch.
 - Chủ kế hoạch đổi passcode ngay trong cài đặt của kế hoạch.
 - Hỗ trợ lưu trữ trực tuyến và xem/chỉnh sửa từ nhiều thiết bị.
@@ -54,21 +61,30 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 
 **Lịch trình, nơi ở và danh sách món ăn** ([03](03-lich-trinh-noi-o-mon-an.md))
 
+- Giờ của hoạt động là tùy chọn; hoạt động không có giờ nằm cuối ngày. Ngày của hoạt động chọn bằng một ô dropdown gồm mọi ngày của chuyến đi. Hoạt động chưa xếp ngày nằm ở mục Ngày chưa xác định; chuyển hoạt động sang ngày khác bằng kéo thả hoặc nút "Chuyển".
 - Ghi lại nơi nhóm ở, kèm ngày của từng nơi. Một chuyến đi có thể có nhiều nơi ở khi đi qua nhiều địa điểm.
 - Lưu danh sách món ăn muốn thử của cả chuyến đi, không gắn với ngày; mỗi món có thể có một hoặc nhiều buổi (sáng, chiều, tối), hiển thị bằng biểu tượng, và lọc được theo buổi.
 
 **Gợi ý quán ăn từ cộng đồng** ([04](04-goi-y-quan-an.md))
 
-- Gợi ý quán ăn từ cộng đồng, không dùng AI: người dùng đã đăng nhập, chủ yếu là người địa phương, đăng một danh sách gợi ý quán ăn (gọi tắt: danh sách gợi ý) cho một khu vực, gồm các món ăn kèm tên quán và đường đến quán. Gợi ý quán ăn là lựa chọn "Quán ăn" trong mục Khám phá, bên cạnh mục kế hoạch, và là một lựa chọn trong tab Ăn gì của mỗi kế hoạch.
+- Gợi ý quán ăn từ cộng đồng, không dùng AI: người dùng đã đăng nhập, chủ yếu là người địa phương, đăng một danh sách gợi ý quán ăn (gọi tắt: danh sách gợi ý) cho một khu vực, gồm các món ăn kèm tên quán và đường đến quán. Danh sách gợi ý xuất hiện trong Khám phá của tab Ăn gì, cùng danh sách món ăn của các hành trình.
 - Cho mọi người tìm danh sách gợi ý theo điểm đến, không phân biệt dấu và tìm gần đúng; người có quyền chỉnh sửa có thể áp dụng một hoặc nhiều danh sách gợi ý, hoặc từng mục, vào danh sách món ăn của kế hoạch rồi tự chỉnh sửa.
-- Cho người đã đăng nhập đánh dấu danh sách gợi ý là hữu ích, và cho mọi người báo cáo danh sách gợi ý. Danh sách gợi ý bị nhiều người báo cáo sẽ bị ẩn cho đến khi admin xem xét.
+- Cho người đã đăng nhập thả tim cho danh sách gợi ý (mỗi tài khoản một tim, dùng để xếp hạng), và cho mọi người báo cáo danh sách gợi ý. Danh sách gợi ý bị nhiều người báo cáo sẽ bị ẩn cho đến khi admin xem xét.
+- Trang người dùng: bấm tên tác giả để xem các hành trình và danh sách gợi ý người đó đã đăng, cùng tổng số tim; không có username hay email.
 - Có trang admin để xem xét danh sách gợi ý bị báo cáo và khóa tài khoản spam.
 
 **Chia sẻ hành trình** ([07](07-chia-se-hanh-trinh.md))
 
-- Cho chủ kế hoạch chia sẻ hành trình của một kế hoạch đã chốt tổng kết lên mục Khám phá: lịch trình theo Ngày 1, Ngày 2, …, nơi ở, món ăn và chi phí ước tính mỗi người; không có tên người tham gia, từng khoản chi phí, QR hay ngày thật của chuyến đi.
-- Cho mọi người tìm hành trình theo điểm đến, và cho người đã đăng nhập sao chép hành trình thành kế hoạch mới của mình.
-- Hữu ích, báo cáo và kiểm duyệt của admin giống danh sách gợi ý.
+- Cho chủ kế hoạch chia sẻ hành trình của một kế hoạch đã chốt tổng kết lên Khám phá: lịch trình theo Ngày 1, Ngày 2, …, nơi ở, món ăn và chi phí ước tính mỗi người; không có tên người tham gia, từng khoản chi phí, QR hay ngày thật của chuyến đi.
+- Khám phá có ở ba nơi, mỗi nơi chỉ gợi ý đúng loại của nơi đó: ở màn hình Kế hoạch là cả kế hoạch (người đã đăng nhập sao chép thành kế hoạch mới chỉ bằng chọn ngày đi), ở tab Lịch trình là lịch trình, ở tab Ăn gì là món ăn (người có quyền chỉnh sửa thêm vào kế hoạch đang có). Tìm được theo điểm đến.
+- Tim, báo cáo và kiểm duyệt của admin giống danh sách gợi ý.
+
+**Chiêu mộ bạn đồng hành** ([08](08-chieu-mo.md))
+
+- Chủ kế hoạch đăng tin chiêu mộ: số người cần thêm, chi phí dự kiến, mô tả; điểm đến, ngày và lịch trình lấy từ kế hoạch, không có tên người hay chi phí.
+- Tab Chiêu mộ ở màn hình Kế hoạch liệt kê các tin đang mở; người đã đăng nhập gửi yêu cầu xin đi cùng kèm lời nhắn và thông tin liên hệ.
+- Chủ kế hoạch tự liên hệ rồi duyệt hoặc từ chối; người được duyệt thành thành viên. Không có chat; thông tin liên hệ chỉ chủ kế hoạch thấy và tự xóa sau 30 ngày.
+- Báo cáo tin và người dùng, chặn người gửi, nhắc an toàn.
 
 **Ngôn ngữ, theme và ảnh nền** ([05](05-ngon-ngu-va-theme.md))
 
@@ -90,6 +106,7 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 - Theo dõi công nợ giữa từng cặp người tham gia. MVP chỉ ghi tiền đóng và tiền trả lại giữa mỗi người và người thu tiền; không theo dõi tiền chuyển trực tiếp giữa hai người tham gia khác.
 - Hiển thị bản đồ hoặc chỉ đường trong ứng dụng. Các hoạt động trong lịch trình có thể lưu một đường link bản đồ.
 - Chỉnh sửa cộng tác realtime (nhiều người cùng chỉnh sửa một kế hoạch cùng lúc).
+- Chat hoặc nhắn tin trong ứng dụng; người dùng tự liên hệ nhau bằng thông tin liên hệ của mình.
 - Cài đặt sáng/tối riêng cho từng người dùng. Giao diện của kế hoạch do theme của kế hoạch quyết định.
 - Tự động kiểm duyệt ảnh người dùng tải lên.
 - Xuất bản tổng kết ra định dạng khác ngoài ảnh (ví dụ: PDF hoặc bảng tính), trừ khi được bổ sung thành yêu cầu sau này.
@@ -97,31 +114,32 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 ### Dự kiến sau MVP
 
 - Liên kết món ăn với khoản chi phí.
-- Trang hồ sơ tác giả: thông tin tác giả và các danh sách gợi ý, hành trình đã đăng, nhóm theo khu vực.
+- Trang người dùng nhóm bài theo khu vực (MVP có trang người dùng cơ bản, [R83](04-goi-y-quan-an.md)).
+- Đánh giá bạn đồng hành sau chuyến đi; gợi ý ghép nhóm theo điểm đến và ngày trùng nhau ([08](08-chieu-mo.md)).
 - Trang "Quán được nhắc đến nhiều nhất" của mỗi khu vực, gộp từ nhiều danh sách.
 - Theo dõi các tác giả địa phương mình thích.
 - Ảnh món ăn trong danh sách (cần thêm kiểm duyệt ảnh).
 - Bình luận hoặc hỏi tác giả về quán.
 - Đánh dấu món "đã ăn" và chấm điểm.
-- Sao chép hành trình vào một kế hoạch đã có; MVP chỉ sao chép thành kế hoạch mới.
 
 ## Các module
 
 | Module | Nội dung | Rule |
 |---|---|---|
-| [01 Kế hoạch và quyền truy cập](01-ke-hoach-va-quyen-truy-cap.md) | Đăng nhập của người tạo, tên hiển thị và username, kế hoạch, giới hạn tên, link chia sẻ, passcode, edit lock, xóa kế hoạch, danh sách kế hoạch hai mục, thứ tự hiển thị theo thời gian | R2–R11, R22, R24, R60–R62, R73, R78 |
+| [01 Kế hoạch và quyền truy cập](01-ke-hoach-va-quyen-truy-cap.md) | Đăng nhập của người tạo, tên hiển thị và username, kế hoạch, giới hạn tên, đổi ngày, link chia sẻ, passcode, edit lock, xóa kế hoạch, danh sách kế hoạch hai mục, thành viên và link mời, thứ tự hiển thị theo thời gian | R2–R11, R22, R24, R60–R62, R73, R78, R80, R84, R85 |
 | [02 Người tham gia, chi phí và tổng kết](02-nguoi-tham-gia-va-chi-phi.md) | Tiền tệ của kế hoạch, người tham gia, chi phí, tiền đóng, làm tròn, tổng kết từng người, tạm khóa và chốt tổng kết, người thu tiền, QR chuyển khoản | R1, R12–R21, R23, R25–R27, R54–R57, R59, R70–R72, R75, R76 |
-| [03 Lịch trình, nơi ở và danh sách món ăn](03-lich-trinh-noi-o-mon-an.md) | Lịch trình, nơi ở, danh sách món ăn | R31–R33, R58 |
-| [04 Gợi ý quán ăn từ cộng đồng](04-goi-y-quan-an.md) | Đăng, tìm, áp dụng danh sách gợi ý; báo cáo; admin | R34–R45 |
+| [03 Lịch trình, nơi ở và danh sách món ăn](03-lich-trinh-noi-o-mon-an.md) | Lịch trình, Ngày chưa xác định, chọn và chuyển ngày, nơi ở, danh sách món ăn | R31–R33, R58, R81, R82 |
+| [04 Gợi ý quán ăn từ cộng đồng](04-goi-y-quan-an.md) | Đăng, tìm, áp dụng danh sách gợi ý; tim; trang người dùng; báo cáo; admin | R34–R45, R83 |
 | [05 Ngôn ngữ, theme và ảnh nền](05-ngon-ngu-va-theme.md) | Song ngữ, rút gọn số tiền, theme, màu trạng thái tiền, ảnh nền riêng, PWA | R28–R30, R74, R77 |
 | [06 Bảo vệ dữ liệu và chống crawl](06-bao-mat-du-lieu.md) | Chống crawl, noindex, giới hạn lượt đọc | R46–R53 |
-| [07 Chia sẻ hành trình](07-chia-se-hanh-trinh.md) | Chia sẻ hành trình của kế hoạch đã chốt, tìm, sao chép thành kế hoạch mới, báo cáo | R63–R69 |
+| [07 Chia sẻ hành trình](07-chia-se-hanh-trinh.md) | Chia sẻ hành trình của kế hoạch đã chốt, tìm, sao chép thành kế hoạch mới hoặc vào kế hoạch đang có, báo cáo | R63–R69, R79 |
+| [08 Chiêu mộ bạn đồng hành](08-chieu-mo.md) | Tin chiêu mộ, tab Chiêu mộ, xin đi cùng, duyệt, thông tin liên hệ, báo cáo và chặn | R86–R92 |
 
 ## Quy ước
 
 - Tên các trường trong phần Dữ liệu của mỗi module mang tính khái niệm và có thể được điều chỉnh khi triển khai.
 - Mỗi module gồm: Dữ liệu → Quy tắc → Acceptance Criteria → Edge Cases.
-- Mã rule không đổi khi chuyển giữa các file. Rule mới lấy số tiếp theo (hiện là R79), ghi vào đúng module và cập nhật bảng trên.
+- Mã rule không đổi khi chuyển giữa các file. Rule mới lấy số tiếp theo (hiện là R93), ghi vào đúng module và cập nhật bảng trên.
 - Mỗi file giữ dưới khoảng 200 dòng; module dài hơn thì tách tiếp.
 - Data model (ERD): [data-model](../data-model/README.md).
 - Công việc triển khai: [tasks](../tasks/README.md).
