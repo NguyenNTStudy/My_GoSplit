@@ -177,20 +177,26 @@ TypeScript thuần, không phụ thuộc Next.js, React hay Prisma; mỗi file c
 
 ## 9. Bảo mật dữ liệu và chống crawl
 
-- [ ] Trang plan, trang danh sách gợi ý và trang hành trình gắn `noindex` (thẻ meta và header `X-Robots-Tag`), không đưa vào sitemap (R46)
-- [ ] Không chặn các trang này bằng `robots.txt`: công cụ tìm kiếm cần đọc được `noindex`; nếu bị chặn, link vẫn có thể hiện trong kết quả tìm kiếm (R46)
-- [ ] Link chia sẻ dạng `/p/{planId}/{shareKey}`; sai mã hay sai khóa đều trả cùng trang "Không tìm thấy kế hoạch"; so khóa bằng phép so sánh constant-time (R3)
-- [ ] Rate limit theo IP và thiết bị khi đọc plan; giới hạn chặt hơn khi tra sai mã plan hoặc sai khóa; ngưỡng đủ rộng cho cả nhóm dùng chung Wi-Fi (R47)
-- [ ] Vượt giới hạn thì hiện Turnstile để kiểm tra chống bot, tiếp tục vượt thì chặn một thời gian (R47)
-- [ ] Bật Vercel Firewall để lọc bot đã biết (R47)
-- [ ] Mỗi API và server component chỉ trả field mà màn hình cần; test tự động bảo đảm passcode hash, email và mã tài khoản không có trong dữ liệu gửi cho người xem; hành trình không chứa tên người tham gia, khoản chi, tiền đóng, QR hay mã plan gốc (R48, R65)
-- [ ] `Referrer-Policy: no-referrer` cho trang plan; link ra ngoài gắn `rel="noreferrer noopener"` (R50)
-- [ ] Thẻ preview chỉ chứa tên plan, ngày và hình (R51)
-- [ ] Tìm kiếm danh sách gợi ý và hành trình: phân trang có giới hạn, không có API xuất hàng loạt, rate limit như trang plan (R52)
-- [ ] Lưu IP dạng hash có salt (R53)
-- [ ] Ảnh QR và ảnh nền riêng lưu ở storage riêng tư, không có URL công khai; trả ảnh qua route của app có kiểm tra `planId` và khóa chia sẻ, header `Cache-Control: private, no-store` (R30, R57)
-- [ ] Mã hóa thông tin liên hệ của yêu cầu xin đi cùng (AES-GCM, khóa trong biến môi trường, không lưu trong database); chỉ API của chủ plan giải mã; ghi ContactViewLog mỗi lần xem (R91)
-- [ ] Trang tin chiêu mộ gắn `noindex`; tìm tin phân trang có giới hạn và rate limit như tìm hành trình (R46, R52)
+Header ở `src/lib/security-headers.ts` (áp qua `next.config.ts`), phần server ở `src/server/`; test ở `src/server/security.test.ts` và `tests/e2e/security.spec.ts`. Mọi trang có thêm header cơ bản: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, vị trí; bỏ header `X-Powered-By`.
+
+- [x] Trang plan, trang danh sách gợi ý và trang hành trình gắn `noindex` (thẻ meta và header `X-Robots-Tag`), không đưa vào sitemap (R46): header `X-Robots-Tag: noindex, nofollow` cho `/p`, `/guides`, `/itineraries`, `/u` (trang người dùng, R46), `/recruit/{postId}`, cùng các màn tài khoản, admin, lời mời, tạo plan; app không có sitemap. Chỉ `/`, `/explore`, `/recruit`, `/login`, `/signup` được lập chỉ mục. Thẻ meta `robots` thêm vào layout của từng nhóm trang khi làm các trang đó; header đã đủ để công cụ tìm kiếm không lập chỉ mục
+- [x] Không chặn các trang này bằng `robots.txt`: công cụ tìm kiếm cần đọc được `noindex`; nếu bị chặn, link vẫn có thể hiện trong kết quả tìm kiếm (R46): `src/app/robots.ts` cho phép mọi trang, chỉ chặn `/api/`; E2E kiểm tra
+- [ ] Link chia sẻ dạng `/p/{planId}/{shareKey}`; sai mã hay sai khóa đều trả cùng trang "Không tìm thấy kế hoạch"; so khóa bằng phép so sánh constant-time (R3): đã có `findPlanByShareLink` (`src/server/share-link.ts`): kiểm tra dạng mã và khóa, tra theo `planId`, so khóa constant-time, sai phần nào cũng trả `null`. Trang plan và trang "Không tìm thấy kế hoạch" làm ở mục 12
+- [ ] Rate limit theo IP và thiết bị khi đọc plan; giới hạn chặt hơn khi tra sai mã plan hoặc sai khóa; ngưỡng đủ rộng cho cả nhóm dùng chung Wi-Fi (R47): đã có `hitRateLimit` (`src/server/rate-limit.ts`), đếm theo IP (IPv6 tính cả dải /64) và theo thiết bị, cái nào chặt hơn thì theo cái đó. Vượt giới hạn thì phải qua kiểm tra chống bot, vượt gấp ba thì chặn tới hết khung giờ. Bộ đếm dùng Upstash qua REST API (không cần thư viện); chưa có Upstash thì đếm trong bộ nhớ của từng server. Store lỗi thì vẫn cho qua, để sự cố không khóa mọi người. Ngưỡng tạm, chỉnh khi có số liệu thật:
+  - Đọc plan: 1.500 lần mỗi IP và 300 lần mỗi thiết bị trong 10 phút (test: 20 người cùng Wi-Fi, mỗi người 30 lượt, không ai bị chặn)
+  - Tra sai mã hoặc khóa: 40 lần mỗi IP và 10 lần mỗi thiết bị trong 1 giờ
+  - Tìm kiếm: 600 lần mỗi IP và 120 lần mỗi thiết bị trong 10 phút
+  - Còn lại: Upstash (chờ tài khoản), cookie mã thiết bị (đặt trong `src/proxy.ts`), gọi từ trang plan (mục 12) và các API tìm kiếm
+- [ ] Vượt giới hạn thì hiện Turnstile để kiểm tra chống bot, tiếp tục vượt thì chặn một thời gian (R47): đã có `verifyTurnstile` (`src/server/turnstile.ts`), lỗi mạng tính là không qua. Còn widget và màn hình kiểm tra chống bot (đã dời ở [chuẩn bị](01-chuan-bi.md)), key Turnstile (cần domain), cookie ghi nhận đã qua kiểm tra trong khung giờ
+- [ ] Bật Vercel Firewall để lọc bot đã biết (R47): chờ Vercel project (mục 2); bật Bot Protection trong mục Firewall của project, không cần sửa code
+- [ ] Mỗi API và server component chỉ trả field mà màn hình cần; test tự động bảo đảm passcode hash, email và mã tài khoản không có trong dữ liệu gửi cho người xem; hành trình không chứa tên người tham gia, khoản chi, tiền đóng, QR hay mã plan gốc (R48, R65): đã có `findForbiddenFields` và hai danh sách field cấm (`src/server/sensitive-fields.ts`); test cho thấy `createItineraryDraft` không mang theo mã plan, khóa chia sẻ, passcode hay mã tài khoản dù nhận cả dòng plan. Mỗi API và trang viết sau thêm test dùng hàm này
+- [x] `Referrer-Policy: no-referrer` cho trang plan; link ra ngoài gắn `rel="noreferrer noopener"` (R50): header cho `/p/*`; component `ExternalLink` (`src/components/external-link.tsx`) cho mọi link ra ngoài, mở tab mới, không gửi referrer
+- [ ] Thẻ preview chỉ chứa tên plan, ngày và hình (R51): làm cùng thẻ preview ở mục 12
+- [ ] Tìm kiếm danh sách gợi ý và hành trình: phân trang có giới hạn, không có API xuất hàng loạt, rate limit như trang plan (R52): đã có `src/domain/pagination.ts` (20 kết quả mỗi trang do server đặt, tối đa 10 trang) và ngưỡng `search` của rate limit; dùng khi làm các API tìm kiếm (mục 19, 20)
+- [x] Lưu IP dạng hash có salt (R53): `hashIp` (HMAC-SHA256 với `IP_HASH_SALT`) và `clientIp` (`src/server/client-ip.ts`); khóa của rate limit chỉ chứa IP đã hash và hết hạn theo khung giờ. Xóa IP đã hash của báo cáo sau 30 ngày là job ở mục 23
+- [ ] Ảnh QR và ảnh nền riêng lưu ở storage riêng tư, không có URL công khai; trả ảnh qua route của app có kiểm tra `planId` và khóa chia sẻ, header `Cache-Control: private, no-store` (R30, R57): chờ tài khoản Cloudflare R2 (GĐ3)
+- [ ] Mã hóa thông tin liên hệ của yêu cầu xin đi cùng (AES-GCM, khóa trong biến môi trường, không lưu trong database); chỉ API của chủ plan giải mã; ghi ContactViewLog mỗi lần xem (R91): đã có `encryptContacts`, `decryptContacts` (`src/server/contact-crypto.ts`, AES-256-GCM, khóa `CONTACT_ENCRYPTION_KEY`); mã của yêu cầu gắn vào dữ liệu mã hóa nên chép sang yêu cầu khác thì không giải được. API của chủ plan và ContactViewLog làm ở mục 22
+- [ ] Trang tin chiêu mộ gắn `noindex`; tìm tin phân trang có giới hạn và rate limit như tìm hành trình (R46, R52): `noindex` đã có cho `/recruit/{postId}`; phân trang và rate limit dùng chung với tìm kiếm khi làm mục 22
 
 ## 10. Email và đổi passcode
 
