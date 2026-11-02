@@ -105,44 +105,58 @@ TypeScript thuần, không phụ thuộc Next.js, React hay Prisma; mỗi file c
 
 ## 5. Đa ngôn ngữ
 
-- [ ] Cài next-intl với 2 ngôn ngữ: Tiếng Việt và English (R28)
-- [ ] Đưa toàn bộ chữ trên giao diện vào file dịch `messages/vi.json` và `messages/en.json`, không viết cứng chữ trong component
-- [ ] Tên app theo ngôn ngữ: Góp Gạo / GoSplit (tiêu đề trang, manifest, email, thẻ preview)
-- [ ] Lần đầu dùng ngôn ngữ của trình duyệt, ngôn ngữ khác thì dùng English; cho đổi trong menu cài đặt (R28)
-- [ ] Lưu lựa chọn ngôn ngữ trên thiết bị; lưu theo account khi đã đăng nhập (R28)
-- [ ] Link chia sẻ không chứa ngôn ngữ; người mở link thấy plan theo ngôn ngữ của họ (R28)
-- [ ] Định dạng ngày giờ và thứ trong tuần theo ngôn ngữ
-- [ ] Định dạng số tiền theo ngôn ngữ và tiền tệ của plan bằng `Intl.NumberFormat` (ký hiệu ngắn, chỉ hiện phần lẻ khi tiền tệ có phần lẻ); nhận đúng dấu thập phân khi nhập (`,` hoặc `.`); tiền tệ không có phần lẻ thì `.` và `,` đều là dấu phân cách hàng nghìn (R1, R18, R28)
-- [ ] Rút gọn số tiền là bội số của 1.000: `k` trong tiếng Việt, `K` trong tiếng Anh, ở mọi nơi hiển thị kể cả ảnh xuất; ô nhập nhận hậu tố `k`/`K` (R74)
-- [ ] Dịch thông báo lỗi validation (Zod)
-- [ ] Gửi email theo ngôn ngữ người dùng đang dùng khi yêu cầu (R28)
-- [ ] Kiểm tra thiếu key dịch trong CI; bật rule ESLint chặn chữ viết cứng trong JSX (`react/jsx-no-literals`) sau khi cài next-intl
+- [x] Cài next-intl với 2 ngôn ngữ: Tiếng Việt và English (R28): chế độ không có i18n routing, cấu hình ở `src/i18n/`; root layout đặt `instant = false` vì ngôn ngữ lấy từ cookie nên không trang nào có phần khung tĩnh chung cho mọi ngôn ngữ (Cache Components của Next.js 16)
+- [x] Đưa toàn bộ chữ trên giao diện vào file dịch `messages/vi.json` và `messages/en.json`, không viết cứng chữ trong component; key được kiểm tra kiểu qua `src/i18n/next-intl.d.ts`
+- [x] Tên app theo ngôn ngữ: Góp Gạo / GoSplit (tiêu đề trang, manifest, email, thẻ preview): một key `app.name` trong file dịch, tiêu đề trang đã dùng; manifest (mục 7), email (mục 10), thẻ preview (mục 9) dùng cùng key. Đổi tên app chỉ cần sửa key này
+- [x] Lần đầu dùng ngôn ngữ của trình duyệt, ngôn ngữ khác thì dùng English; cho đổi trong menu cài đặt (R28): đọc `Accept-Language` theo thứ tự ưu tiên (q); nút đổi ngôn ngữ ở `src/components/locale-switcher.tsx`, đặt vào menu cài đặt khi có màn đó
+- [x] Lưu lựa chọn ngôn ngữ trên thiết bị (cookie `locale`, một năm) (R28)
+- [ ] Lưu ngôn ngữ theo account khi đã đăng nhập, và ưu tiên ngôn ngữ của account hơn cookie (R28; chờ mục 8, chỗ cần sửa có ghi TODO trong `src/i18n/request.ts` và `actions.ts`)
+- [x] Link chia sẻ không chứa ngôn ngữ; người mở link thấy plan theo ngôn ngữ của họ (R28): URL không có tiền tố ngôn ngữ
+- [x] Định dạng ngày giờ và thứ trong tuần theo ngôn ngữ: `src/i18n/format.ts` (`T7 05/12`, `12–14/12/2026`, `06:00`; tiếng Anh `Sat, Dec 5`, `6:00 AM`), ngày của chuyến đi không đổi múi giờ
+- [x] Định dạng số tiền theo ngôn ngữ và tiền tệ của plan bằng `Intl.NumberFormat` (ký hiệu ngắn, chỉ hiện phần lẻ khi tiền tệ có phần lẻ); nhận đúng dấu thập phân khi nhập (`,` hoặc `.`); tiền tệ không có phần lẻ thì `.` và `,` đều là dấu phân cách hàng nghìn (R1, R18, R28): `formatMoney` trong `src/i18n/format.ts` (ký hiệu lấy từ danh sách tiền tệ nên giống nhau ở hai ngôn ngữ), `parseAmountInput` trong `src/domain/amount-input.ts`
+- [x] Rút gọn số tiền là bội số của 1.000: `k` trong tiếng Việt, `K` trong tiếng Anh, ở mọi nơi hiển thị kể cả ảnh xuất; ô nhập nhận hậu tố `k`/`K` (R74)
+- [x] Dịch thông báo lỗi validation (Zod): `src/i18n/validation.ts`; câu lỗi của Zod theo ngôn ngữ từng lần kiểm tra (không đặt cấu hình chung cho server), câu lỗi riêng của schema và mã lỗi của `src/domain` là key `validation.*` trong file dịch
+- [ ] Gửi email theo ngôn ngữ người dùng đang dùng khi yêu cầu (R28; làm cùng mục 10)
+- [x] Kiểm tra thiếu key dịch trong CI; bật rule ESLint chặn chữ viết cứng trong JSX (`react/jsx-no-literals`) sau khi cài next-intl: `src/i18n/i18n.test.ts` so key, biến trong câu và mã lỗi của domain giữa hai file dịch (chạy trong `npm test`); rule ESLint áp cho `src/app` và `src/components` (trừ `ui/` của shadcn)
 
 ## 6. Theme
 
-- [ ] Định nghĩa design token (màu, font, bo góc, khoảng cách) bằng CSS variables; mỗi theme gồm một bộ token và một bộ hình (R29)
-- [ ] Chọn theme khi tạo plan, có xem trước (R29)
-- [ ] Màu trạng thái tiền cố định, không theo theme: xanh lá cho đủ hoặc dư, đỏ cho thiếu; số tiền không kèm chữ nhưng có nhãn cho trình đọc màn hình (R77)
-- [ ] Đổi theme trong phần sửa plan (R29)
-- [ ] Áp theme của plan cho mọi người mở plan; các màn hình ngoài plan dùng Gạo ấm (R29)
-- [ ] Tối ưu hình (WebP/AVIF, nhiều kích thước, lazy load) để tải nhanh trên điện thoại
-- [ ] Hình chưa tải xong hoặc lỗi thì plan vẫn đọc được bằng màu của theme
-- [ ] Chữ đặt trên hình có lớp phủ để đủ độ tương phản (WCAG AA)
-- [ ] Ảnh export tổng kết và thẻ preview link dùng hình của theme (R29)
-- [ ] Theme đã bị gỡ khỏi app thì plan dùng Gạo ấm
-- [ ] Thêm theme mới chỉ cần thêm token và hình, không phải sửa component
-- [ ] Đổi ảnh nền: người có quyền chỉnh sửa tải ảnh riêng thay hình của theme, gỡ ảnh để quay về hình theme (R30)
-- [ ] Nhận JPG, PNG, WebP, HEIC tối đa 10 MB; tự thu nhỏ, nén và chuyển sang WebP (R30)
-- [ ] Xóa thông tin vị trí (GPS) và metadata khác khỏi ảnh trước khi lưu (R30)
-- [ ] Cho kéo để chọn vùng ảnh hiển thị (R30)
-- [ ] Nhắc người tải ảnh rằng ai có link cũng xem được ảnh (R30)
-- [ ] Ảnh export tổng kết và thẻ preview link dùng ảnh riêng nếu plan có (R30)
+- [x] Định nghĩa design token (màu, font, bo góc, khoảng cách) bằng CSS variables; mỗi theme gồm một bộ token và một bộ hình (R29): token ở `src/app/globals.css`, mỗi theme một khối `[data-theme="…"]`, Gạo ấm là mặc định ở `:root`; khoảng cách dùng thang của Tailwind; font Be Vietnam Pro (chữ thường) và Lora (tiêu đề) qua `next/font`; hình ở `public/themes/{mã theme}.svg`, lấy từ wireframe T1–T5; danh sách theme ở `src/domain/themes.ts`. Năm theme này tạm theo wireframe, chờ chốt danh sách và hình ở [chuẩn bị](01-chuan-bi.md)
+- [ ] Chọn theme khi tạo plan, có xem trước (R29): đã có `ThemePicker` (`src/components/theme/theme-picker.tsx`) gửi field `theme` trong form; đặt vào màn tạo plan ở mục 12
+- [x] Màu trạng thái tiền cố định, không theo theme: xanh lá cho đủ hoặc dư, đỏ cho thiếu; số tiền không kèm chữ nhưng có nhãn cho trình đọc màn hình (R77): token `--money-ok`, `--money-short` chỉ khai báo một lần ở `:root`; component `MoneyStatusAmount` có nhãn ẩn "Còn thiếu"/"Dư"; test bảo đảm không theme nào đổi màu này
+- [ ] Đổi theme trong phần sửa plan (R29): dùng lại `ThemePicker`, làm cùng "Sửa thông tin plan" ở mục 12
+- [ ] Áp theme của plan cho mọi người mở plan; các màn hình ngoài plan dùng Gạo ấm (R29): đã có `ThemeScope` (đặt `data-theme` và lớp `dark` cho Đêm); bọc layout `/p/{planId}/{shareKey}` bằng theme lấy từ plan khi làm trang plan ở mục 12. Màn hình ngoài plan không bọc nên dùng Gạo ấm
+- [x] Tối ưu hình (WebP/AVIF, nhiều kích thước, lazy load) để tải nhanh trên điện thoại: hình theme là SVG 2–3 KB, không cần tối ưu; ảnh khác qua `next/image` (AVIF/WebP trong `next.config.ts`, `sizes`, lazy load mặc định); hình đầu trang plan tải trước (`preload`). Ảnh nền riêng: khi làm route trả ảnh ở mục 9 (`Cache-Control: private, no-store`) cần chọn giữa bộ tối ưu của `next/image` (cache ảnh ở server theo URL có khóa chia sẻ) và tạo sẵn vài kích thước lúc tải lên
+- [x] Hình chưa tải xong hoặc lỗi thì plan vẫn đọc được bằng màu của theme: phần đầu trang (`PlanHero`) có màu nền `--hero` của theme dưới hình
+- [x] Chữ đặt trên hình có lớp phủ để đủ độ tương phản (WCAG AA): tên và dòng phụ đặt trên khung `--scrim`; test tính độ tương phản cho mọi theme với hình nền trắng và đen, đều từ 4.5 trở lên
+- [ ] Ảnh export tổng kết và thẻ preview link dùng hình của theme (R29): làm cùng export ảnh (mục 18) và thẻ preview (mục 12)
+- [x] Theme đã bị gỡ khỏi app thì plan dùng Gạo ấm: `resolveTheme` trả Gạo ấm cho mã không còn trong danh sách
+- [x] Thêm theme mới chỉ cần thêm token và hình, không phải sửa component: thêm một dòng vào `THEMES`, một khối token, một file SVG và tên theme trong hai file dịch; test báo thiếu nếu quên phần nào
+- [ ] Đổi ảnh nền: người có quyền chỉnh sửa tải ảnh riêng thay hình của theme, gỡ ảnh để quay về hình theme (R30): `PlanHero` đã nhận ảnh riêng thay hình theme; màn hình tải ảnh làm cùng cài đặt plan (mục 12), storage R2 ở mục 9
+- [ ] Nhận JPG, PNG, WebP, HEIC tối đa 10 MB; tự thu nhỏ, nén và chuyển sang WebP (R30): đã xong trừ HEIC, ở `processCoverImage` (`src/server/images/cover-image.ts`, sharp): kiểm tra 10 MB và định dạng, xoay theo EXIF, thu nhỏ còn rộng tối đa 2000 px, WebP chất lượng 80. sharp cài sẵn không đọc được HEIC của iPhone (chỉ đọc AVIF), nên ảnh HEIC đang bị từ chối với lỗi riêng; chờ quyết định cách xử lý HEIC, áp dụng cho cả ảnh QR (R55)
+- [x] Xóa thông tin vị trí (GPS) và metadata khác khỏi ảnh trước khi lưu (R30): `processCoverImage` không giữ metadata nào; test bằng ảnh có EXIF và GPS
+- [ ] Cho kéo để chọn vùng ảnh hiển thị (R30): `PlanHero` nhận điểm tâm `{x, y}` (field `coverImageCrop`); phần kéo chọn làm cùng màn tải ảnh
+- [ ] Nhắc người tải ảnh rằng ai có link cũng xem được ảnh (R30): làm cùng màn tải ảnh
+- [ ] Ảnh export tổng kết và thẻ preview link dùng ảnh riêng nếu plan có (R30): làm cùng export ảnh (mục 18) và thẻ preview (mục 12)
 
 ## 7. Web responsive và app (PWA)
 
-- [ ] Layout responsive: điện thoại một cột; desktop tận dụng chiều ngang (ví dụ danh sách chi phí và tổng kết cạnh nhau)
-- [ ] PWA: web app manifest, icon, màn hình khởi động, cài lên màn hình chính
-- [ ] Kiểm tra cài đặt và sử dụng trên iOS Safari và Android Chrome
+- [x] Layout responsive: điện thoại một cột; desktop tận dụng chiều ngang (ví dụ danh sách chi phí và tổng kết cạnh nhau): component chung ở `src/components/layout/`, xem thử ở `/dev/layout` (chỉ có ở môi trường dev); các màn hình dùng khi làm từ mục 12
+  - Dưới 768 px (`md`): một cột, thanh trên chỉ có tên app và nút nhỏ, nút chính cố định ở dưới (`BottomActionBar`); trang plan không có thanh trên, bắt đầu bằng phần đầu của plan
+  - Từ 768 px: thanh trên đầy đủ (`SiteHeader`), nút chính nằm trong trang hoặc trên thanh trên
+  - Từ 1024 px (`lg`): cột phụ 360 px bên phải, đứng yên khi cuộn (`SplitLayout`); ở điện thoại nội dung cột phụ nằm ở tab riêng
+  - Nội dung rộng tối đa 1152 px như wireframe web (`PageContainer`); lề trang và nút dưới tránh tai thỏ, thanh home của iPhone (`px-page`, `pb-safe`, `viewport-fit=cover`)
+  - E2E kiểm tra trang không bị cuộn ngang ở cả điện thoại và desktop
+- [x] PWA: web app manifest, icon, màn hình khởi động, cài lên màn hình chính
+  - Manifest theo ngôn ngữ: `/manifests/vi`, `/manifests/en` (file tĩnh). Trình duyệt tải manifest không kèm cookie nên ngôn ngữ nằm trong URL; tên app lấy từ key `app.name`
+  - Icon tạm (bát cơm có hạt gạo rơi vào), chờ chốt tên app và logo: vẽ lại ở `scripts/generate-pwa-assets.mjs` rồi chạy `npm run pwa:generate`. Script sinh favicon, icon cho iPhone, icon 192/512 và icon maskable cho Android, ảnh khởi động
+  - Màn hình khởi động: Android tự tạo từ màu nền và icon trong manifest; iPhone dùng ảnh khởi động cho 12 cỡ màn hình (danh sách ở `src/lib/pwa.ts`, có test kiểm tra đủ ảnh). Chưa làm cho iPad
+  - Màu nền và màu thanh trình duyệt là màu nền Gạo ấm
+  - Chưa có service worker: yêu cầu không cần dùng offline, và Chrome cho cài app không cần service worker
+- [ ] Kiểm tra cài đặt và sử dụng trên iOS Safari và Android Chrome: phần tự động đã có ở `tests/e2e/pwa.spec.ts` (Chrome đọc manifest không lỗi, icon và ảnh khởi động tải được, manifest đúng ngôn ngữ). Phần thử trên máy thật cần link HTTPS, làm khi có Vercel (mục 2):
+  - iPhone, Safari: Chia sẻ → Thêm vào MH chính; tên và icon đúng; mở app thấy ảnh khởi động, không có thanh địa chỉ; nút dưới không đè thanh home; xoay ngang không bị tai thỏ che
+  - Android, Chrome: có lời mời cài hoặc mục Cài đặt ứng dụng; icon không bị cắt; màn hình khởi động có icon trên nền kem
+  - Cả hai: đổi ngôn ngữ rồi cài thì tên app theo ngôn ngữ đó
 
 ## 8. Auth và phân quyền
 

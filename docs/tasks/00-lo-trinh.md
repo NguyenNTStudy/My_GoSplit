@@ -39,7 +39,7 @@ Requirements, data model và wireframe (điện thoại và desktop) đã chốt
 - [x] GitHub Actions: `npm ci`, `npm run lint`, `npm run typecheck`, `npm run format:check`, `npm test`; job E2E chạy Playwright trên bản build.
 - [x] Tạo `.env.example` theo bảng biến môi trường bên dưới.
 - [ ] Tạo Vercel project (Root Directory là `go-split`), biến môi trường, preview deploy cho mỗi PR.
-- [ ] Đưa token Gạo ấm vào CSS variables; font Lora và Be Vietnam Pro qua `next/font`.
+- [x] Đưa token Gạo ấm vào CSS variables; font Lora và Be Vietnam Pro qua `next/font` (cùng các theme khác, ở mục 6).
 - [x] Viết hàm chia chi phí đầu tiên kèm test (R16–R19) để chạy thử cả pipeline.
 
 ## Cấu trúc thư mục
@@ -50,13 +50,14 @@ go-split/
     app/          route và layout; chỉ ghép giao diện và gọi server
     domain/       TypeScript thuần: tiền, làm tròn, tiền tệ, ngày, phân quyền, chuẩn hóa không dấu
     server/       Prisma (db.ts, generated/ do prisma generate sinh), auth, server action theo module, rate limit, email, storage
-    components/   ui/ (shadcn) và theo module: plan, schedule, food, costs, summary, explore, recruit
+    components/   ui/ (shadcn), layout/, theme/ và theo module: plan, schedule, food, costs, summary, explore, recruit
     lib/          tiện ích nhỏ dùng chung cho giao diện (utils.ts của shadcn)
     i18n/         cấu hình next-intl
     proxy.ts      header noindex, rate limit, chuyển hướng đăng nhập
   messages/       vi.json, en.json
   prisma/         schema.prisma, migrations, seed (cấu hình ở prisma7.config.ts)
   tests/e2e/      Playwright
+  scripts/        sinh danh sách tiền tệ, icon và ảnh khởi động
 ```
 
 ## Thư viện đã kiểm tra (02/11/2026)
@@ -65,7 +66,7 @@ Cài từ npm công khai (`registry.npmjs.org`), như `package-lock.json`.
 
 | Thư viện | Phiên bản | Ghi chú |
 |---|---|---|
-| next-intl | 4.14 | Ghi hỗ trợ Next.js 16 và React 19; cài ở mục 5 |
+| next-intl | 4.14 | Đã cài ở mục 5, chế độ không có i18n routing |
 | better-auth | 1.7 | Ghi hỗ trợ Next.js 16, React 19, Prisma 5–7; cài ở mục 8 |
 | PGlite | 0.5 | Postgres chạy trong bộ nhớ, có `pg_trgm` và `unaccent`; dùng để test migration khi chưa có Neon |
 | Prisma (CLI, client, adapter Neon) | 7.10.1 | Tag `latest` của CLI đang trỏ tới bản RC 8.0.0, nên ghim cả bộ ở 7.10.1; lên Prisma 8 khi có bản ổn định và Better Auth hỗ trợ. Prisma 7 cần driver adapter và đọc URL từ `prisma7.config.ts`, không từ schema |
@@ -74,7 +75,9 @@ Cài từ npm công khai (`registry.npmjs.org`), như `package-lock.json`.
 | Playwright | 1.64 | Chỉ tải Chromium |
 | decimal.js | 10.6 | Đã cài cho `src/domain` |
 | cldr-core | 49 | Dữ liệu tiền tệ theo vùng cho script sinh danh sách tiền tệ (devDependency) |
-| Zod, React Hook Form, `@hookform/resolvers` | 4.6, 7.91, 7.0 | Hỗ trợ React 19 và Zod 4; cài ở task dùng tới |
+| Zod | 4.6 | Đã cài ở mục 5; có sẵn câu lỗi tiếng Việt và tiếng Anh |
+| React Hook Form, `@hookform/resolvers` | 7.91, 7.0 | Hỗ trợ React 19 và Zod 4; cài ở task dùng tới |
+| sharp | 0.35.5 | Xử lý ảnh nền và ảnh QR; Next.js đã dùng sharp nên ghim cùng bản. Bản cài sẵn không đọc được HEIC của iPhone |
 
 Không thư viện nào trong danh sách thiếu hỗ trợ Next.js 16 hay React 19.3, nên chưa phải thay thư viện nào.
 

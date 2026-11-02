@@ -1,0 +1,77 @@
+{
+  "app": {
+    "name": "Góp Gạo",
+    "description": "Lên kế hoạch chuyến đi và chia tiền cùng bạn bè."
+  },
+  "home": {
+    "title": "Góp Gạo đang được xây dựng",
+    "body": "Sắp có: lên kế hoạch chuyến đi, chia tiền bữa ăn và tổng kết ai thiếu ai dư."
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "themes": {
+    "legend": "Chọn theme cho kế hoạch",
+    "preview": "Xem trước theme",
+    "previewTotal": "Tổng chi",
+    "previewItem": "Thuê homestay 2 đêm",
+    "previewItemDetail": "An trả · chia 4 người",
+    "names": {
+      "gao-am": "Gạo ấm",
+      "bien": "Biển",
+      "nui-rung": "Núi rừng",
+      "pho-co": "Phố cổ",
+      "dem": "Đêm"
+    }
+  },
+  "money": {
+    "shortage": "Còn thiếu",
+    "surplus": "Dư"
+  },
+  "dev": {
+    "themesTitle": "Xem thử theme",
+    "themesIntro": "Trang này chỉ có ở môi trường dev, để so các theme với wireframe.",
+    "samplePlan": "Đà Lạt cuối tuần",
+    "sampleSubtitle": "Đà Lạt · 12–14/12/2026 · 5 người",
+    "primary": "Thêm chi phí",
+    "outline": "Đổi người",
+    "secondary": "Lịch trình",
+    "layoutTitle": "Xem thử layout",
+    "layoutIntro": "Điện thoại một cột, có nút chính cố định ở dưới; từ 1024 px thì phần tổng kết nằm bên phải.",
+    "layoutItem": "Khoản chi {n}",
+    "layoutAside": "Tổng chi"
+  },
+  "validation": {
+    "amount": {
+      "empty": "Nhập số tiền.",
+      "invalid": "Số tiền không hợp lệ.",
+      "not_a_number": "Số tiền không hợp lệ.",
+      "not_positive": "Số tiền phải lớn hơn 0.",
+      "too_large": "Số tiền quá lớn.",
+      "fraction_not_allowed": "Tiền tệ này không có phần lẻ, chỉ nhập số nguyên.",
+      "too_many_decimals": "Chỉ nhập tối đa 3 chữ số sau dấu thập phân."
+    },
+    "ratio": {
+      "not_a_number": "Tỷ lệ không hợp lệ.",
+      "not_positive": "Tỷ lệ phải lớn hơn 0.",
+      "too_large": "Tỷ lệ quá lớn.",
+      "too_many_decimals": "Tỷ lệ có tối đa 4 chữ số sau dấu thập phân."
+    },
+    "text": {
+      "empty": "Không được để trống.",
+      "too_long": "Tối đa {max} ký tự."
+    },
+    "planDates": {
+      "invalid_date": "Ngày không hợp lệ.",
+      "end_before_start": "Ngày về phải từ ngày đi trở đi.",
+      "too_long": "Kế hoạch dài tối đa {max} ngày."
+    },
+    "batch": {
+      "no_participants": "Chọn ít nhất một người.",
+      "duplicate_participant": "Một người được chọn hai lần.",
+      "nothing_to_record": "Chưa có số tiền nào để ghi."
+    }
+  }
+}

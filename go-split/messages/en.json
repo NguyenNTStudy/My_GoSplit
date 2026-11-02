@@ -1,0 +1,77 @@
+{
+  "app": {
+    "name": "GoSplit",
+    "description": "Plan trips and split costs with friends."
+  },
+  "home": {
+    "title": "GoSplit is under construction",
+    "body": "Coming soon: trip planning, splitting a meal, and a summary of who owes what."
+  },
+  "language": {
+    "label": "Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "themes": {
+    "legend": "Choose a theme for the plan",
+    "preview": "Theme preview",
+    "previewTotal": "Total spent",
+    "previewItem": "Homestay, 2 nights",
+    "previewItemDetail": "An paid · split by 4",
+    "names": {
+      "gao-am": "Warm rice",
+      "bien": "Sea",
+      "nui-rung": "Mountains",
+      "pho-co": "Old town",
+      "dem": "Night"
+    }
+  },
+  "money": {
+    "shortage": "Owes",
+    "surplus": "Gets back"
+  },
+  "dev": {
+    "themesTitle": "Theme preview",
+    "themesIntro": "Development only: compare the themes with the wireframes.",
+    "samplePlan": "Da Lat weekend",
+    "sampleSubtitle": "Da Lat · Dec 12–14, 2026 · 5 people",
+    "primary": "Add expense",
+    "outline": "Switch person",
+    "secondary": "Schedule",
+    "layoutTitle": "Layout preview",
+    "layoutIntro": "One column with a fixed main action on phones; from 1024 px the summary sits on the right.",
+    "layoutItem": "Expense {n}",
+    "layoutAside": "Total spent"
+  },
+  "validation": {
+    "amount": {
+      "empty": "Enter an amount.",
+      "invalid": "This amount isn't valid.",
+      "not_a_number": "This amount isn't valid.",
+      "not_positive": "The amount must be more than 0.",
+      "too_large": "The amount is too large.",
+      "fraction_not_allowed": "This currency has no fractions. Enter a whole number.",
+      "too_many_decimals": "Use at most 3 digits after the decimal point."
+    },
+    "ratio": {
+      "not_a_number": "This ratio isn't valid.",
+      "not_positive": "The ratio must be more than 0.",
+      "too_large": "The ratio is too large.",
+      "too_many_decimals": "Use at most 4 digits after the decimal point."
+    },
+    "text": {
+      "empty": "This can't be empty.",
+      "too_long": "Use at most {max} characters."
+    },
+    "planDates": {
+      "invalid_date": "This date isn't valid.",
+      "end_before_start": "The end date can't be before the start date.",
+      "too_long": "A plan can last at most {max} days."
+    },
+    "batch": {
+      "no_participants": "Select at least one person.",
+      "duplicate_participant": "Someone is selected twice.",
+      "nothing_to_record": "There's no amount to record yet."
+    }
+  }
+}

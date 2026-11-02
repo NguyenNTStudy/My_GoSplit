@@ -45,6 +45,34 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // All UI text comes from messages/*.json (task 5); props like className are fine.
+    files: ["src/app/**/*.tsx", "src/components/**/*.tsx"],
+    ignores: ["src/components/ui/**"],
+    rules: {
+      "react/jsx-no-literals": [
+        "error",
+        {
+          noStrings: true,
+          ignoreProps: true,
+          allowedStrings: [
+            "·",
+            "–",
+            "—",
+            "/",
+            "×",
+            "…",
+            "%",
+            "+",
+            "-",
+            ":",
+            "(",
+            ")",
+          ],
+        },
+      ],
+    },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
