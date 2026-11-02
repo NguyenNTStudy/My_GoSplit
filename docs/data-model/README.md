@@ -87,11 +87,13 @@ erDiagram
 - Thêm `areaSearch` (bản không dấu của khu vực) cho Stay, FoodGuide và ItineraryStay, và `destinationSearch` cho Itinerary (R34).
 - `token` của link mời → `tokenHash`; PlanInvite thêm `usedByAccountId` và `revokedAt`. PlanMember thêm `joinedVia`.
 - Thêm bảng EmailToken và GuideApplication; thêm `createdAt` cho Participant để giữ thứ tự hiển thị.
+- Account là bảng `User` của Better Auth (plugin username và admin): `displayName` là `name`, `isAdmin` là `role = admin`, `isBlocked` là `banned`. Bảng `Account` của Better Auth là các cách đăng nhập (Google, mật khẩu), không phải tài khoản người dùng.
+- `userTag` bắt đầu bằng 4 chữ số; khi tag 4 chữ số trùng nhiều thì server cấp 5 chữ số trở lên, nên tag vẫn duy nhất mà không giới hạn số tài khoản (R37).
 
 ## Quy tắc xóa
 
 - Xóa Plan thì xóa toàn bộ dữ liệu con: PlanMember, PlanInvite, RecruitPost (cùng JoinRequest, ContactViewLog, RecruitReport), Participant, Contribution, Expense, ExpenseShare, Activity, Stay, FoodItem, PaymentQr, EmailToken, GuideApplication, ItineraryCopy. Ảnh nền và ảnh QR trong storage cũng bị xóa (R22, R24, R30, R57).
-- Xóa Participant: nếu có trong Expense, ExpenseShare, Contribution hoặc là `Plan.collectorParticipantId` thì chỉ đổi `status = inactive`; nếu không thì xóa hẳn, không hỏi xác nhận. Participant là `Plan.ownerParticipantId` không xóa được (R13, R26).
+- Xóa Participant: nếu có trong Expense, ExpenseShare, Contribution hoặc là `Plan.collectorParticipantId` thì chỉ đổi `status = inactive`; nếu không thì xóa hẳn, không hỏi xác nhận. Participant là `Plan.ownerParticipantId` không xóa được (R13, R26). Trigger trong database chặn xóa hẳn các trường hợp này khi kế hoạch còn; khóa ngoại từ khoản chi, phần chia, tiền đóng tới người tham gia là cascade chỉ để xóa cả kế hoạch chạy đúng theo mọi thứ tự.
 - Xóa Participant (xóa hẳn hoặc chuyển `inactive`) thì xóa PlanMember gắn với nó và hủy PlanInvite chưa dùng của nó; thành viên rời hoặc bị gỡ thì chỉ xóa PlanMember, giữ Participant (R84).
 - Xóa Expense thì xóa các ExpenseShare của nó.
 - Xóa Activity thì xóa các Expense gắn với nó, kèm ExpenseShare của chúng (R58).
@@ -108,8 +110,8 @@ erDiagram
 ## Ràng buộc và index
 
 - Plan: `shareKey` duy nhất; `ownerId` bắt buộc; `kind` là `basic` hoặc `detailed`, không đổi (R93); với `detailed`: `startDate`, `endDate` bắt buộc và `startDate <= endDate <= startDate + 59 ngày` (R2); với `basic`: `startDate`, `endDate`, `location`, `theme`, `coverImagePath` trống (R94); danh sách kế hoạch lấy qua PlanMember theo `accountId`, sắp theo `startDate` (kế hoạch `basic` dùng ngày của `createdAt`, R96), chia mục theo `summaryStatus` (R60–R62).
-- PlanMember: khóa chính `(planId, accountId)`; `participantId` duy nhất; đúng một dòng `owner` mỗi kế hoạch, khớp `Plan.ownerId`; index `(accountId)` cho danh sách kế hoạch (R62, R84).
-- PlanInvite: `tokenHash` duy nhất; mỗi người tham gia tối đa một link còn hiệu lực (`usedAt` và `revokedAt` trống, chưa hết hạn) (R85).
+- PlanMember: khóa chính `(planId, accountId)`; `participantId` duy nhất; đúng một dòng `owner` mỗi kế hoạch, khớp `Plan.ownerId` (server kiểm tra; database chỉ bắt `owner` đi cùng `joinedVia = created`); index `(accountId)` cho danh sách kế hoạch (R62, R84).
+- PlanInvite: `tokenHash` duy nhất; mỗi người tham gia tối đa một link còn hiệu lực (`usedAt` và `revokedAt` trống, chưa hết hạn); server hủy link cũ trong cùng transaction khi tạo link mới (R85).
 - RecruitPost: `planId` duy nhất; `seatsTaken <= seatsWanted`; index `(status)` kết hợp `Plan.startDate`, và index trigram trên `destinationSearch` (R86, R87).
 - JoinRequest: duy nhất theo `(postId, requesterId)` (R88); gửi lại sau khi hết hạn thì cập nhật dòng cũ về `pending`; index `(postId, status)` cho màn duyệt và `(requesterId, status)` cho bộ lọc Đã gửi.
 - AccountBlock: khóa chính `(blockerId, blockedId)`; RecruitReport duy nhất theo `(postId, reporterAccountId)` và `(postId, reporterIpHash)` (R92).

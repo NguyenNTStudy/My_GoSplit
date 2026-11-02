@@ -49,32 +49,35 @@ Mỗi dịch vụ là một task, làm trước giai đoạn ghi trong ngoặc. 
 
 ## 3. Database
 
-- [ ] Prisma schema theo [data model](../data-model/README.md): Plan, PlanMember, Participant, Activity, Expense, ExpenseShare, Contribution, EmailToken
-- [ ] Bảng PlanMember (vai trò owner, editor, viewer) và PlanInvite (token lưu dạng hash, dùng một lần, hết hạn 7 ngày); tạo plan thì thêm dòng `owner` gắn với người tham gia của chủ plan, cùng transaction; danh sách plan truy vấn qua PlanMember (R84, R85)
-- [ ] Bảng RecruitPost, JoinRequest, ContactViewLog, RecruitReport, AccountReport, AccountBlock; cột `recruitEmails` của account (R86–R92)
-- [ ] Field `collectorParticipantId` của plan, mặc định là người tham gia đại diện chủ plan; đổi thì xóa QR (R54)
-- [ ] QR chuyển khoản của plan (tối đa một QR mỗi plan, của người thu tiền): đường dẫn ảnh trong storage riêng tư, nhãn, thời điểm cập nhật (R54)
-- [ ] Bảng Stay (nơi ở, có khu vực và mã quốc gia) và FoodItem (món ăn) (R31, R33)
-- [ ] FoodItem: không có `date`; `mealSlots` là mảng buổi (sáng, chiều, tối), có thể trống; `directions` (đường đến quán, nhập tự do) thay cho `mapLink`; không lưu liên kết tới danh sách gợi ý gốc (R33, R41)
-- [ ] Bảng FoodGuide, FoodGuideEntry, GuideHeart, GuideReport (R35–R45)
-- [ ] Bảng ghi lại danh sách gợi ý nào đã áp dụng vào plan nào, để mỗi plan chỉ tính một lượt sử dụng (R41)
-- [ ] Bảng Itinerary, ItineraryActivity, ItineraryStay, ItineraryFood, ItineraryHeart, ItineraryReport, ItineraryCopy (mỗi plan một lượt sao chép); `sourcePlanId` duy nhất, đặt trống khi xóa plan (R63–R69)
-- [ ] Lưu thêm bản không dấu của khu vực (Stay, FoodGuide, Itinerary, ItineraryStay); bật extension `unaccent`, `pg_trgm` và tạo index trigram (R34)
-- [ ] Field ngôn ngữ, `displayName`, `username` (duy nhất, chữ thường), `userTag` (duy nhất), `publicId` (ngẫu nhiên, duy nhất, cho địa chỉ trang người dùng), quyền admin và trạng thái bị khóa của account (R28, R37, R44, R78, R83)
-- [ ] Bảng/field cho passcode lock, edit lock và email token của link mở khóa (R9)
-- [ ] Field `currency` (mã ISO 4217) của plan và hành trình; server chỉ nhận mã có trong danh sách tiền tệ, và chỉ cho đổi khi plan chưa có khoản chi, tiền đóng và tổng kết đang mở (R1, R72)
-- [ ] Field `summaryStatus` (`open`, `locked`, `final`) và `summaryStatusChangedAt` của plan; server chặn ghi Participant, Activity, Expense, ExpenseShare khi tổng kết đang `locked` hoặc `final`; không cho đổi khỏi `final` (R59)
-- [ ] Field `kind` của plan (`basic`, `detailed`) và ràng buộc theo loại: plan `basic` không có ngày, địa điểm, theme, ảnh nền; Expense và Contribution của plan `basic` không có `dateTime`; server từ chối Activity, Stay, FoodItem, RecruitPost, Itinerary cho plan `basic` (R93–R96)
-- [ ] Field `theme` của plan (R29)
-- [ ] Field `coverImage` của plan: đường dẫn ảnh và vùng hiển thị (R30)
-- [ ] `planId` dạng `VARCHAR`, sinh ngẫu nhiên 10 chữ số bằng crypto, trùng thì sinh lại (R4)
-- [ ] Field `shareKey` của plan: chuỗi ngẫu nhiên ít nhất 128 bit, sinh bằng crypto, dạng an toàn cho URL (R3)
-- [ ] Mã định danh ngẫu nhiên (UUID hoặc cuid) cho mọi bảng khác, không dùng số tự tăng (R49)
-- [ ] Lưu số tiền dạng `NUMERIC(14,3)`, tỷ lệ dạng `NUMERIC`
-- [ ] Index: `(ownerId, startDate)`, `(planId, dateTime)` của Expense, `(planId, date, time)` của Activity, `(planId, order)` của FoodItem, các khóa ngoại `planId` (R33, R60)
-- [ ] Xóa plan thì xóa cascade toàn bộ dữ liệu con (R22)
-- [ ] Cập nhật `plan.updatedAt` khi bất kỳ dữ liệu con nào thay đổi
-- [ ] Seed data cho môi trường dev
+Schema ở `go-split/prisma/schema.prisma`, migration đầu tiên ở `prisma/migrations/20261102000000_init` (phần SQL viết tay: extension, CHECK, trigger). `src/server/migrations.test.ts` chạy migration trên Postgres trong bộ nhớ (PGlite) và kiểm tra các ràng buộc đó.
+
+- [ ] Chạy migration lên Neon (`prisma migrate deploy`) cho branch `dev` và `preview` (chờ task tài khoản Neon)
+- [x] Prisma schema theo [data model](../data-model/README.md): Plan, PlanMember, Participant, Activity, Expense, ExpenseShare, Contribution, EmailToken
+- [x] Bảng PlanMember (vai trò owner, editor, viewer) và PlanInvite (token lưu dạng hash, dùng một lần, hết hạn 7 ngày); tạo plan thì thêm dòng `owner` gắn với người tham gia của chủ plan, cùng transaction; danh sách plan truy vấn qua PlanMember (R84, R85). Phần bảng đã xong; tạo dòng `owner`, mỗi plan đúng một owner và mỗi người tham gia một link mời còn hiệu lực do server kiểm tra ở mục 12, 13 (Prisma chưa hỗ trợ unique index có điều kiện)
+- [x] Bảng RecruitPost, JoinRequest, ContactViewLog, RecruitReport, AccountReport, AccountBlock; cột `recruitEmails` của account (R86–R92)
+- [x] Field `collectorParticipantId` của plan, mặc định là người tham gia đại diện chủ plan; đổi thì xóa QR (R54) (xóa QR khi đổi người thu tiền làm ở mục 18)
+- [x] QR chuyển khoản của plan (tối đa một QR mỗi plan, của người thu tiền): đường dẫn ảnh trong storage riêng tư, nhãn, thời điểm cập nhật (R54)
+- [x] Bảng Stay (nơi ở, có khu vực và mã quốc gia) và FoodItem (món ăn) (R31, R33)
+- [x] FoodItem: không có `date`; `mealSlots` là mảng buổi (sáng, chiều, tối), có thể trống; `directions` (đường đến quán, nhập tự do) thay cho `mapLink`; không lưu liên kết tới danh sách gợi ý gốc (R33, R41)
+- [x] Bảng FoodGuide, FoodGuideEntry, GuideHeart, GuideReport (R35–R45)
+- [x] Bảng ghi lại danh sách gợi ý nào đã áp dụng vào plan nào, để mỗi plan chỉ tính một lượt sử dụng (R41)
+- [x] Bảng Itinerary, ItineraryActivity, ItineraryStay, ItineraryFood, ItineraryHeart, ItineraryReport, ItineraryCopy (mỗi plan một lượt sao chép); `sourcePlanId` duy nhất, đặt trống khi xóa plan (R63–R69)
+- [x] Lưu thêm bản không dấu của khu vực (Stay, FoodGuide, Itinerary, ItineraryStay); bật extension `unaccent`, `pg_trgm` và tạo index trigram (R34); hàm chuẩn hóa không dấu làm ở mục 4
+- [x] Field ngôn ngữ, `displayName`, `username` (duy nhất, chữ thường), `userTag` (duy nhất), `publicId` (ngẫu nhiên, duy nhất, cho địa chỉ trang người dùng), quyền admin và trạng thái bị khóa của account (R28, R37, R44, R78, R83): account là bảng `User` của Better Auth (plugin username và admin); `displayName` là `name`, quyền admin là `role`, bị khóa là `banned`; hàm sinh `userTag` và `publicId` ở `src/domain/ids.ts`
+- [x] Bảng/field cho passcode lock, edit lock và email token của link mở khóa (R9)
+- [x] Field `currency` (mã ISO 4217) của plan và hành trình; server chỉ nhận mã có trong danh sách tiền tệ, và chỉ cho đổi khi plan chưa có khoản chi, tiền đóng và tổng kết đang mở (R1, R72) (field và CHECK dạng mã đã có; kiểm tra danh sách và điều kiện đổi làm ở mục 12)
+- [x] Field `summaryStatus` (`open`, `locked`, `final`) và `summaryStatusChangedAt` của plan; server chặn ghi Participant, Activity, Expense, ExpenseShare khi tổng kết đang `locked` hoặc `final`; không cho đổi khỏi `final` (R59) (field đã có; phần chặn ghi làm ở mục 17, 18)
+- [x] Field `kind` của plan (`basic`, `detailed`) và ràng buộc theo loại: plan `basic` không có ngày, địa điểm, theme, ảnh nền; Expense và Contribution của plan `basic` không có `dateTime`; server từ chối Activity, Stay, FoodItem, RecruitPost, Itinerary cho plan `basic` (R93–R96). CHECK trong database cho các field của plan (kể cả 60 ngày và mô tả 100 ký tự); phần kiểm tra theo bảng con do server làm ở mục 12, 14–17
+- [x] Field `theme` của plan (R29)
+- [x] Field `coverImage` của plan: đường dẫn ảnh và vùng hiển thị (R30)
+- [x] `planId` dạng `VARCHAR`, sinh ngẫu nhiên 10 chữ số bằng crypto, trùng thì sinh lại (R4) (hàm sinh ở `src/domain/ids.ts`; vòng sinh lại khi trùng nằm trong hàm tạo plan ở mục 12)
+- [x] Field `shareKey` của plan: chuỗi ngẫu nhiên ít nhất 128 bit, sinh bằng crypto, dạng an toàn cho URL (R3)
+- [x] Mã định danh ngẫu nhiên (UUID hoặc cuid) cho mọi bảng khác, không dùng số tự tăng (R49): UUID v7; bảng của Better Auth dùng mã do Better Auth sinh
+- [x] Lưu số tiền dạng `NUMERIC(14,3)`, tỷ lệ dạng `NUMERIC` (tỷ lệ `NUMERIC(12,4)`)
+- [x] Index: `(ownerId, startDate)`, `(planId, dateTime)` của Expense, `(planId, date, time)` của Activity, `(planId, order)` của FoodItem, các khóa ngoại `planId` (R33, R60)
+- [x] Xóa plan thì xóa cascade toàn bộ dữ liệu con (R22); trigger chặn xóa hẳn người tham gia còn khoản chi, phần chia, tiền đóng hoặc là chủ, người thu tiền khi plan vẫn còn (R13)
+- [x] Cập nhật `plan.updatedAt` khi bất kỳ dữ liệu con nào thay đổi (trigger trên người tham gia, tiền đóng, QR, khoản chi, phần chia, hoạt động, nơi ở, món ăn)
+- [ ] Seed data cho môi trường dev (cần hàm băm passcode ở mục 8 và database Neon)
 
 ## 4. Logic nghiệp vụ (`src/domain`)
 

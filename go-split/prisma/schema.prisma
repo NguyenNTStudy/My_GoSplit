@@ -1,13 +1,743 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Data model: docs/data-model. Rule ids (R..) point to docs/requirements.
+// Constraints Prisma can't express (checks, partial unique indexes, triggers) live in the migration SQL.
+//
+// Dates follow docs/data-model/README.md "Ngày giờ": trip dates are local and never converted
+// (@db.Date, @db.Timestamp), system times are @db.Timestamptz.
 
 generator client {
   provider = "prisma-client"
   output   = "../src/server/generated/prisma"
 }
 
+// pg_trgm and unaccent are created by the first migration (the `extensions` field is still a preview feature).
 datasource db {
   provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Accounts (Better Auth: core + username + admin plugins). "Account" in the data
+// model is this User table; Better Auth's own Account table holds sign-in methods.
+// ---------------------------------------------------------------------------
+
+model User {
+  id              String    @id
+  name            String // display name, shown as author (R78)
+  email           String    @unique
+  emailVerified   Boolean   @default(false)
+  image           String?
+  username        String?   @unique // lower case, sign-in only, never shown (R78)
+  displayUsername String?
+  role            String? // "admin" for the admin page (R44)
+  banned          Boolean?  @default(false) // locked account (R44)
+  banReason       String?
+  banExpires      DateTime? @db.Timestamptz(3)
+  language        String?   @db.VarChar(8) // vi | en (R28)
+  userTag         String    @unique @db.VarChar(12) // assigned by the app (R37)
+  publicId        String    @unique @db.VarChar(32) // profile address /u/{publicId} (R83)
+  recruitEmails   Boolean   @default(true) // R90
+  createdAt       DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(3)
+
+  sessions Session[]
+  accounts Account[]
+
+  plansOwned       Plan[]            @relation("PlanOwner")
+  planMemberships  PlanMember[]
+  invitesUsed      PlanInvite[]
+  foodGuides       FoodGuide[]
+  guideHearts      GuideHeart[]
+  guideReports     GuideReport[]
+  itineraries      Itinerary[]
+  itineraryHearts  ItineraryHeart[]
+  itineraryReports ItineraryReport[]
+  joinRequests     JoinRequest[]
+  contactViews     ContactViewLog[]
+  recruitReports   RecruitReport[]
+  reportsReceived  AccountReport[]   @relation("AccountReportReported")
+  reportsMade      AccountReport[]   @relation("AccountReportReporter")
+  blocksMade       AccountBlock[]    @relation("AccountBlockBlocker")
+  blockedBy        AccountBlock[]    @relation("AccountBlockBlocked")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime @db.Timestamptz(3)
+  token          String   @unique
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([identifier])
+}
+
+// ---------------------------------------------------------------------------
+// Plans, members, participants, money (modules 01, 02, 09)
+// ---------------------------------------------------------------------------
+
+enum PlanKind {
+  basic
+  detailed
+}
+
+enum SummaryStatus {
+  open
+  locked
+  final
+}
+
+enum MemberRole {
+  owner
+  editor
+  viewer
+}
+
+enum GrantedRole {
+  editor
+  viewer
+}
+
+enum JoinedVia {
+  created
+  invite
+  request
+}
+
+enum ParticipantStatus {
+  active
+  inactive
+}
+
+enum ContributionKind {
+  contribution
+  refund
+}
+
+enum MealSlot {
+  morning
+  afternoon
+  evening
+}
+
+enum EmailTokenPurpose {
+  unlock
+}
+
+model Plan {
+  planId                 String        @id @db.VarChar(16) // 10 random digits (R4)
+  shareKey               String        @unique // secret part of the share link (R3)
+  kind                   PlanKind // fixed at creation (R93)
+  name                   String        @db.VarChar(50) // R73
+  location               String? // detailed only (R94)
+  startDate              DateTime?     @db.Date // detailed only (R2, R94)
+  endDate                DateTime?     @db.Date
+  notes                  String? // basic: short description, max 100 (R94)
+  currency               String        @db.Char(3) // ISO 4217 (R1)
+  theme                  String? // detailed only (R29)
+  coverImagePath         String? // private storage (R30)
+  coverImageCrop         Json?
+  ownerId                String
+  owner                  User          @relation("PlanOwner", fields: [ownerId], references: [id])
+  // Plan and participant reference each other; both are set in the create transaction.
+  ownerParticipantId     String?       @unique @db.Uuid
+  ownerParticipant       Participant?  @relation("PlanOwnerParticipant", fields: [ownerParticipantId], references: [participantId], onDelete: NoAction, onUpdate: NoAction)
+  collectorParticipantId String?       @unique @db.Uuid
+  collectorParticipant   Participant?  @relation("PlanCollector", fields: [collectorParticipantId], references: [participantId], onDelete: NoAction, onUpdate: NoAction)
+  passcodeHash           String // argon2 (R5)
+  passcodeVersion        Int           @default(1) // bumped on change to end old edit sessions (R11)
+  failedPasscodeAttempts Int           @default(0) // R9
+  passcodeLockedUntil    DateTime?     @db.Timestamptz(3)
+  unlockEmailSentAt      DateTime?     @db.Timestamptz(3)
+  editLockSessionId      String? // R8
+  editLockExpiresAt      DateTime?     @db.Timestamptz(3)
+  summaryStatus          SummaryStatus @default(open) // R59
+  summaryStatusChangedAt DateTime?     @db.Timestamptz(3)
+  createdAt              DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime      @updatedAt @db.Timestamptz(3) // also bumped by child rows (trigger)
+
+  participants      Participant[]      @relation("PlanParticipants")
+  members           PlanMember[]
+  invites           PlanInvite[]
+  emailTokens       EmailToken[]
+  contributions     Contribution[]
+  expenses          Expense[]
+  activities        Activity[]
+  stays             Stay[]
+  foodItems         FoodItem[]
+  paymentQr         PaymentQr?
+  guideApplications GuideApplication[]
+  sharedItinerary   Itinerary?
+  itineraryCopies   ItineraryCopy[]
+  recruitPost       RecruitPost?
+
+  @@index([ownerId, startDate])
+}
+
+model PlanMember {
+  planId        String      @db.VarChar(16)
+  plan          Plan        @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  accountId     String
+  account       User        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  role          MemberRole // R84
+  participantId String      @unique @db.Uuid
+  participant   Participant @relation(fields: [participantId], references: [participantId], onDelete: Cascade)
+  joinedVia     JoinedVia // R85, R89
+  createdAt     DateTime    @default(now()) @db.Timestamptz(3)
+
+  @@id([planId, accountId])
+  @@index([accountId])
+}
+
+model PlanInvite {
+  inviteId        String      @id @default(uuid(7)) @db.Uuid
+  planId          String      @db.VarChar(16)
+  plan            Plan        @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  participantId   String      @db.Uuid
+  participant     Participant @relation(fields: [participantId], references: [participantId], onDelete: Cascade)
+  role            GrantedRole
+  tokenHash       String      @unique
+  expiresAt       DateTime    @db.Timestamptz(3) // 7 days (R85)
+  usedAt          DateTime?   @db.Timestamptz(3)
+  usedByAccountId String?
+  usedByAccount   User?       @relation(fields: [usedByAccountId], references: [id], onDelete: SetNull)
+  revokedAt       DateTime?   @db.Timestamptz(3)
+  createdAt       DateTime    @default(now()) @db.Timestamptz(3)
+
+  @@index([planId])
+  @@index([participantId])
+}
+
+model EmailToken {
+  id        String            @id @default(uuid(7)) @db.Uuid
+  planId    String            @db.VarChar(16)
+  plan      Plan              @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  purpose   EmailTokenPurpose // R9
+  tokenHash String            @unique
+  expiresAt DateTime          @db.Timestamptz(3)
+  usedAt    DateTime?         @db.Timestamptz(3)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+
+  @@index([planId])
+}
+
+model Participant {
+  participantId String            @id @default(uuid(7)) @db.Uuid
+  planId        String            @db.VarChar(16)
+  plan          Plan              @relation("PlanParticipants", fields: [planId], references: [planId], onDelete: Cascade)
+  displayName   String
+  status        ParticipantStatus @default(active) // R13
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3) // display order
+
+  ownerOfPlan     Plan?          @relation("PlanOwnerParticipant")
+  collectorOfPlan Plan?          @relation("PlanCollector")
+  member          PlanMember?
+  invites         PlanInvite[]
+  contributions   Contribution[]
+  expensesPaid    Expense[]
+  expenseShares   ExpenseShare[]
+
+  @@index([planId, createdAt])
+}
+
+model Contribution {
+  contributionId String           @id @default(uuid(7)) @db.Uuid
+  planId         String           @db.VarChar(16)
+  plan           Plan             @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  // Cascade only so deleting a whole plan works in any order; a trigger stops deleting a
+  // participant who still has money rows while the plan exists (R13).
+  participantId  String           @db.Uuid
+  participant    Participant      @relation(fields: [participantId], references: [participantId], onDelete: Cascade)
+  kind           ContributionKind // R23
+  amount         Decimal          @db.Decimal(14, 3) // > 0 (R18)
+  dateTime       DateTime?        @db.Timestamp(3) // trip-local; empty for basic plans (R96)
+  note           String?
+  batchId        String?          @db.Uuid // rows recorded together (R75)
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+
+  @@index([planId, dateTime])
+  @@index([participantId])
+}
+
+model PaymentQr {
+  planId    String   @id @db.VarChar(16) // at most one QR per plan (R54)
+  plan      Plan     @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  imagePath String // private storage (R57)
+  label     String?
+  updatedAt DateTime @updatedAt @db.Timestamptz(3) // shown in the summary (R56)
+}
+
+model Expense {
+  expenseId           String      @id @default(uuid(7)) @db.Uuid
+  planId              String      @db.VarChar(16)
+  plan                Plan        @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  description         String
+  amount              Decimal     @db.Decimal(14, 3) // > 0 (R14, R18)
+  paidByParticipantId String      @db.Uuid // R15
+  paidBy              Participant @relation(fields: [paidByParticipantId], references: [participantId], onDelete: Cascade) // guarded by trigger (R13)
+  dateTime            DateTime?   @db.Timestamp(3) // trip-local; empty for basic plans (R96)
+  notes               String?
+  activityId          String?     @db.Uuid // R25; deleting the activity deletes the expense (R58)
+  activity            Activity?   @relation(fields: [activityId], references: [activityId], onDelete: Cascade)
+  createdAt           DateTime    @default(now()) @db.Timestamptz(3)
+
+  shares ExpenseShare[]
+
+  @@index([planId, dateTime])
+  @@index([paidByParticipantId])
+  @@index([activityId])
+}
+
+model ExpenseShare {
+  expenseId     String      @db.Uuid
+  expense       Expense     @relation(fields: [expenseId], references: [expenseId], onDelete: Cascade)
+  participantId String      @db.Uuid
+  participant   Participant @relation(fields: [participantId], references: [participantId], onDelete: Cascade) // guarded by trigger (R13)
+  ratio         Decimal     @default(1) @db.Decimal(12, 4) // > 0 (R16)
+
+  @@id([expenseId, participantId])
+  @@index([participantId])
+}
+
+// ---------------------------------------------------------------------------
+// Schedule, stays, food (module 03, detailed plans only)
+// ---------------------------------------------------------------------------
+
+model Activity {
+  activityId String    @id @default(uuid(7)) @db.Uuid
+  planId     String    @db.VarChar(16)
+  plan       Plan      @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  name       String
+  date       DateTime? @db.Date // empty = "Ngày chưa xác định" (R81)
+  time       String?   @db.VarChar(5) // HH:mm, optional (R60)
+  location   String?
+  mapLink    String?
+  notes      String?
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  expenses Expense[]
+
+  @@index([planId, date, time])
+}
+
+model Stay {
+  stayId       String   @id @default(uuid(7)) @db.Uuid
+  planId       String   @db.VarChar(16)
+  plan         Plan     @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  name         String
+  area         String
+  areaSearch   String // accent-free (R34)
+  country      String   @db.Char(2) // ISO 3166-1
+  address      String?
+  mapLink      String?
+  checkInDate  DateTime @db.Date // R31
+  checkOutDate DateTime @db.Date
+
+  @@index([planId, checkInDate])
+  @@index([areaSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model FoodItem {
+  foodItemId String     @id @default(uuid(7)) @db.Uuid
+  planId     String     @db.VarChar(16)
+  plan       Plan       @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  mealSlots  MealSlot[] @default([]) // R33
+  dishName   String
+  placeName  String?
+  directions String? // free text (R36)
+  notes      String?
+  order      Int
+
+  @@index([planId, order])
+}
+
+// ---------------------------------------------------------------------------
+// Food guides (module 04)
+// ---------------------------------------------------------------------------
+
+enum ContentStatus {
+  published
+  hidden // auto-hidden after reports (R43)
+  removed // removed by an admin (R44)
+}
+
+enum GuideReportReason {
+  ads
+  wrong_info
+  closed
+  inappropriate
+}
+
+model FoodGuide {
+  guideId     String        @id @default(uuid(7)) @db.Uuid
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id])
+  title       String
+  area        String
+  areaSearch  String // accent-free (R34)
+  country     String        @db.Char(2)
+  description String
+  language    String        @db.VarChar(8)
+  isLocal     Boolean       @default(false) // "Tôi sống ở đây" (R37)
+  status      ContentStatus @default(published)
+  heartCount  Int           @default(0) // R42
+  applyCount  Int           @default(0) // R41
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime      @updatedAt @db.Timestamptz(3) // "Cập nhật lần cuối" (R39)
+
+  entries      FoodGuideEntry[]
+  hearts       GuideHeart[]
+  reports      GuideReport[]
+  applications GuideApplication[]
+
+  @@index([authorId])
+  @@index([status, areaSearch])
+  @@index([areaSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model FoodGuideEntry {
+  entryId    String     @id @default(uuid(7)) @db.Uuid
+  guideId    String     @db.Uuid
+  guide      FoodGuide  @relation(fields: [guideId], references: [guideId], onDelete: Cascade)
+  dishName   String
+  placeName  String // at least 3 distinct places per guide (R35)
+  directions String? // free text (R36)
+  mealSlots  MealSlot[] @default([])
+  notes      String?
+  order      Int
+
+  @@index([guideId, order])
+}
+
+model GuideHeart {
+  guideId   String    @db.Uuid
+  guide     FoodGuide @relation(fields: [guideId], references: [guideId], onDelete: Cascade)
+  accountId String
+  account   User      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@id([guideId, accountId])
+  @@index([accountId])
+}
+
+model GuideReport {
+  reportId          String            @id @default(uuid(7)) @db.Uuid
+  guideId           String            @db.Uuid
+  guide             FoodGuide         @relation(fields: [guideId], references: [guideId], onDelete: Cascade)
+  reason            GuideReportReason
+  reporterAccountId String?
+  reporterAccount   User?             @relation(fields: [reporterAccountId], references: [id], onDelete: SetNull)
+  reporterIpHash    String? // signed-out reporters; cleared after 30 days (R53)
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+
+  @@unique([guideId, reporterAccountId])
+  @@unique([guideId, reporterIpHash])
+}
+
+model GuideApplication {
+  guideId   String    @db.Uuid
+  guide     FoodGuide @relation(fields: [guideId], references: [guideId], onDelete: Cascade)
+  planId    String    @db.VarChar(16)
+  plan      Plan      @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  appliedAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@id([guideId, planId]) // one use per plan (R41)
+  @@index([planId])
+}
+
+// ---------------------------------------------------------------------------
+// Shared itineraries (module 07)
+// ---------------------------------------------------------------------------
+
+enum ItineraryReportReason {
+  ads
+  wrong_info
+  personal_info
+  inappropriate
+}
+
+model Itinerary {
+  itineraryId            String        @id @default(uuid(7)) @db.Uuid
+  authorId               String
+  author                 User          @relation(fields: [authorId], references: [id])
+  // Never sent to viewers (R66); deleting the plan keeps the itinerary.
+  sourcePlanId           String?       @unique @db.VarChar(16)
+  sourcePlan             Plan?         @relation(fields: [sourcePlanId], references: [planId], onDelete: SetNull)
+  title                  String        @db.VarChar(50) // R73
+  destination            String
+  destinationSearch      String // accent-free (R34)
+  description            String?
+  language               String        @db.VarChar(8)
+  theme                  String
+  dayCount               Int
+  groupSize              Int
+  estimatedCostPerPerson Decimal?      @db.Decimal(14, 3) // R65
+  currency               String        @db.Char(3)
+  status                 ContentStatus @default(published)
+  heartCount             Int           @default(0) // R69
+  copyCount              Int           @default(0) // R68, R79
+  createdAt              DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime      @updatedAt @db.Timestamptz(3)
+
+  activities ItineraryActivity[]
+  stays      ItineraryStay[]
+  foods      ItineraryFood[]
+  hearts     ItineraryHeart[]
+  reports    ItineraryReport[]
+  copies     ItineraryCopy[]
+
+  @@index([authorId])
+  @@index([status, destinationSearch])
+  @@index([destinationSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model ItineraryActivity {
+  itemId      String    @id @default(uuid(7)) @db.Uuid
+  itineraryId String    @db.Uuid
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  day         Int // 1..dayCount (R64)
+  time        String?   @db.VarChar(5)
+  name        String
+  location    String?
+  mapLink     String?
+  notes       String?
+
+  @@index([itineraryId, day, time])
+}
+
+model ItineraryStay {
+  itemId      String    @id @default(uuid(7)) @db.Uuid
+  itineraryId String    @db.Uuid
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  name        String
+  area        String
+  areaSearch  String // accent-free (R34)
+  country     String    @db.Char(2)
+  address     String?
+  mapLink     String?
+  checkInDay  Int
+  checkOutDay Int
+
+  @@index([itineraryId])
+  @@index([areaSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model ItineraryFood {
+  itemId      String     @id @default(uuid(7)) @db.Uuid
+  itineraryId String     @db.Uuid
+  itinerary   Itinerary  @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  dishName    String
+  placeName   String?
+  directions  String?
+  mealSlots   MealSlot[] @default([])
+  notes       String?
+  order       Int
+
+  @@index([itineraryId, order])
+}
+
+model ItineraryHeart {
+  itineraryId String    @db.Uuid
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  accountId   String
+  account     User      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@id([itineraryId, accountId])
+  @@index([accountId])
+}
+
+model ItineraryReport {
+  reportId          String                @id @default(uuid(7)) @db.Uuid
+  itineraryId       String                @db.Uuid
+  itinerary         Itinerary             @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  reason            ItineraryReportReason
+  reporterAccountId String?
+  reporterAccount   User?                 @relation(fields: [reporterAccountId], references: [id], onDelete: SetNull)
+  reporterIpHash    String? // cleared after 30 days (R53)
+  createdAt         DateTime              @default(now()) @db.Timestamptz(3)
+
+  @@unique([itineraryId, reporterAccountId])
+  @@unique([itineraryId, reporterIpHash])
+}
+
+model ItineraryCopy {
+  itineraryId String    @db.Uuid
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [itineraryId], onDelete: Cascade)
+  planId      String    @db.VarChar(16)
+  plan        Plan      @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@id([itineraryId, planId]) // one copy counted per plan (R68, R79)
+  @@index([planId])
+}
+
+// ---------------------------------------------------------------------------
+// Recruiting travel companions (module 08)
+// ---------------------------------------------------------------------------
+
+enum RecruitPostStatus {
+  open
+  closed
+  hidden // auto-hidden after reports (R92)
+  removed // removed by an admin
+}
+
+enum RecruitClosedReason {
+  full
+  owner
+  started
+  summary
+}
+
+enum JoinRequestStatus {
+  pending
+  accepted
+  declined
+  withdrawn
+  expired
+}
+
+enum RecruitReportReason {
+  fraud
+  ads
+  wrong_info
+  inappropriate
+}
+
+enum AccountReportReason {
+  fraud
+  harassment
+  impersonation
+  inappropriate
+}
+
+model RecruitPost {
+  postId            String               @id @default(uuid(7)) @db.Uuid
+  planId            String               @unique @db.VarChar(16) // one post per plan (R86)
+  plan              Plan                 @relation(fields: [planId], references: [planId], onDelete: Cascade)
+  title             String               @db.VarChar(50)
+  seatsWanted       Int // 1..20
+  seatsTaken        Int                  @default(0) // sum of accepted party sizes
+  costPerPerson     Decimal?             @db.Decimal(14, 3)
+  description       String               @db.VarChar(1000)
+  wishes            String?              @db.VarChar(500)
+  language          String               @db.VarChar(8)
+  destinationSearch String // accent-free copy of Plan.location (R34, R87)
+  status            RecruitPostStatus    @default(open)
+  closedReason      RecruitClosedReason?
+  closedAt          DateTime?            @db.Timestamptz(3)
+  createdAt         DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime             @updatedAt @db.Timestamptz(3)
+
+  requests JoinRequest[]
+  reports  RecruitReport[]
+
+  @@index([status])
+  @@index([destinationSearch(ops: raw("gin_trgm_ops"))], type: Gin)
+}
+
+model JoinRequest {
+  requestId        String            @id @default(uuid(7)) @db.Uuid
+  postId           String            @db.Uuid
+  post             RecruitPost       @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  requesterId      String
+  requester        User              @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  partySize        Int // includes the requester (R88)
+  message          String            @db.VarChar(500)
+  contactsEnc      Bytes? // AES-GCM, owner-only (R91)
+  contactsPurgedAt DateTime?         @db.Timestamptz(3) // cleared 30 days after a decision
+  status           JoinRequestStatus @default(pending)
+  role             GrantedRole? // chosen on approval (R89)
+  decidedAt        DateTime?         @db.Timestamptz(3)
+  createdAt        DateTime          @default(now()) @db.Timestamptz(3)
+
+  contactViews ContactViewLog[]
+  reports      AccountReport[]
+
+  @@unique([postId, requesterId]) // one request per post (R88)
+  @@index([postId, status])
+  @@index([requesterId, status])
+}
+
+model ContactViewLog {
+  id        String      @id @default(uuid(7)) @db.Uuid
+  requestId String      @db.Uuid
+  request   JoinRequest @relation(fields: [requestId], references: [requestId], onDelete: Cascade)
+  accountId String
+  account   User        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime    @default(now()) @db.Timestamptz(3)
+
+  @@index([requestId])
+}
+
+model RecruitReport {
+  reportId          String              @id @default(uuid(7)) @db.Uuid
+  postId            String              @db.Uuid
+  post              RecruitPost         @relation(fields: [postId], references: [postId], onDelete: Cascade)
+  reason            RecruitReportReason
+  reporterAccountId String?
+  reporterAccount   User?               @relation(fields: [reporterAccountId], references: [id], onDelete: SetNull)
+  reporterIpHash    String? // cleared after 30 days (R53)
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+
+  @@unique([postId, reporterAccountId])
+  @@unique([postId, reporterIpHash])
+}
+
+model AccountReport {
+  reportId          String              @id @default(uuid(7)) @db.Uuid
+  reportedAccountId String
+  reportedAccount   User                @relation("AccountReportReported", fields: [reportedAccountId], references: [id], onDelete: Cascade)
+  reporterAccountId String
+  reporterAccount   User                @relation("AccountReportReporter", fields: [reporterAccountId], references: [id], onDelete: Cascade)
+  reason            AccountReportReason
+  requestId         String?             @db.Uuid // reported from a join request
+  request           JoinRequest?        @relation(fields: [requestId], references: [requestId], onDelete: SetNull)
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+
+  @@index([reportedAccountId])
+}
+
+model AccountBlock {
+  blockerId String
+  blocker   User     @relation("AccountBlockBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User     @relation("AccountBlockBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@id([blockerId, blockedId])
+  @@index([blockedId])
 }
