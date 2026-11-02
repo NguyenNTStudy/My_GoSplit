@@ -58,7 +58,7 @@ Liên quan: [01 Kế hoạch và quyền truy cập](01-ke-hoach-va-quyen-truy-c
 
 ## Quy tắc
 
-- **R86.** Chủ kế hoạch đăng được một tin chiêu mộ cho kế hoạch khi tổng kết đang mở ([R59](02-nguoi-tham-gia-va-chi-phi.md)) và ngày đi còn ở tương lai.
+- **R86.** Chủ kế hoạch đăng được một tin chiêu mộ cho kế hoạch chi tiết ([R94](09-ke-hoach-co-ban.md)) khi tổng kết đang mở ([R59](02-nguoi-tham-gia-va-chi-phi.md)) và ngày đi còn ở tương lai.
   - **Nội dung tin:** tiêu đề, số người cần thêm, chi phí dự kiến mỗi người (tùy chọn), mô tả, mong muốn về bạn đi cùng (tùy chọn) và ngôn ngữ.
   - **Lấy từ kế hoạch:** điểm đến, ngày đi, ngày về, số người tham gia đang hoạt động và lịch trình, nên luôn khớp với kế hoạch. Lịch trình chỉ gồm giờ, tên và địa điểm của hoạt động theo từng ngày, không có hoạt động ở Ngày chưa xác định ([R81](03-lich-trinh-noi-o-mon-an.md)).
   - **Không bao giờ có trong tin:** tên người tham gia, các khoản chi, tiền đóng, ghi chú, nơi ở, link chia sẻ hay passcode.

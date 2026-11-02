@@ -1,6 +1,6 @@
 # 03 — Lịch trình, nơi ở và danh sách món ăn
 
-Lịch trình theo ngày, nơi nhóm ở và danh sách món ăn muốn thử của cả chuyến đi.
+Lịch trình theo ngày, nơi nhóm ở và danh sách món ăn muốn thử của cả chuyến đi. Chỉ có ở kế hoạch chi tiết ([R94](09-ke-hoach-co-ban.md)).
 
 Liên quan: [02 Người tham gia, chi phí và tổng kết](02-nguoi-tham-gia-va-chi-phi.md) · [04 Gợi ý quán ăn từ cộng đồng](04-goi-y-quan-an.md) · [Tổng quan](README.md)
 

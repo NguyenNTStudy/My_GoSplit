@@ -107,7 +107,7 @@ erDiagram
 
 ## Ràng buộc và index
 
-- Plan: `shareKey` duy nhất; `ownerId` bắt buộc; `startDate <= endDate <= startDate + 59 ngày` (R2); danh sách kế hoạch lấy qua PlanMember theo `accountId`, sắp theo `startDate`, chia mục theo `summaryStatus` (R60–R62).
+- Plan: `shareKey` duy nhất; `ownerId` bắt buộc; `kind` là `basic` hoặc `detailed`, không đổi (R93); với `detailed`: `startDate`, `endDate` bắt buộc và `startDate <= endDate <= startDate + 59 ngày` (R2); với `basic`: `startDate`, `endDate`, `location`, `theme`, `coverImagePath` trống (R94); danh sách kế hoạch lấy qua PlanMember theo `accountId`, sắp theo `startDate` (kế hoạch `basic` dùng ngày của `createdAt`, R96), chia mục theo `summaryStatus` (R60–R62).
 - PlanMember: khóa chính `(planId, accountId)`; `participantId` duy nhất; đúng một dòng `owner` mỗi kế hoạch, khớp `Plan.ownerId`; index `(accountId)` cho danh sách kế hoạch (R62, R84).
 - PlanInvite: `tokenHash` duy nhất; mỗi người tham gia tối đa một link còn hiệu lực (`usedAt` và `revokedAt` trống, chưa hết hạn) (R85).
 - RecruitPost: `planId` duy nhất; `seatsTaken <= seatsWanted`; index `(status)` kết hợp `Plan.startDate`, và index trigram trên `destinationSearch` (R86, R87).
@@ -132,6 +132,16 @@ erDiagram
 - Contribution: `amount > 0`; index `(planId, dateTime)` để hiển thị theo thời gian (R60, R75).
 - Plan: `collectorParticipantId` là người tham gia của chính kế hoạch đó; đổi người thu tiền thì xóa PaymentQr (R54).
 - Mọi khóa chính trừ `planId` là UUID hoặc cuid, không tự tăng (R49).
+
+## Ngày giờ
+
+Ngày giờ của chuyến đi lưu theo giờ địa phương của chuyến đi, không quy đổi múi giờ: ai xem cũng thấy đúng giờ đã nhập.
+
+- **Chỉ ngày** (kiểu `DATE`): `Plan.startDate`, `Plan.endDate`, `Activity.date`, `Stay.checkInDate`, `Stay.checkOutDate`.
+- **Chỉ giờ** (chuỗi `HH:mm`): `Activity.time`.
+- **Ngày và giờ, không múi giờ** (`timestamp without time zone`): `Expense.dateTime`, `Contribution.dateTime`. Kế hoạch cơ bản để trống hai cột này và xếp theo `createdAt` (R96).
+- **Chỉ thuộc kế hoạch chi tiết:** Activity, Stay, FoodItem, RecruitPost, Itinerary của plan; server từ chối tạo các bản ghi này cho plan `basic` (R94).
+- **Thời điểm hệ thống** (`timestamptz`): `createdAt`, `updatedAt`, hạn của token, lock và các mốc tương tự.
 
 ## Không lưu trong database
 

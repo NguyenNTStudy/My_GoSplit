@@ -4,17 +4,48 @@ Tech stack và thứ tự làm: [README](README.md).
 
 ## 2. Khởi tạo dự án
 
-- [ ] Tạo tài khoản dịch vụ: GitHub, Vercel, Neon, Resend, Upstash, Cloudflare (Turnstile)
-- [ ] Mua domain và cấu hình gửi email (SPF, DKIM) cho Resend
-- [ ] Chốt cấu trúc repo (đề xuất: giữ code trong `go-split/`, Vercel đặt Root Directory là `go-split`), múi giờ và route ([lộ trình](00-lo-trinh.md))
+### Tài khoản dịch vụ
+
+Mỗi dịch vụ là một task, làm trước giai đoạn ghi trong ngoặc. Cách bàn giao:
+
+1. Key bí mật không gửi qua chat. Bản cho máy dev ghi vào `go-split/.env.local` (git bỏ qua file này); bản cho Vercel đặt trong Project Settings → Environment Variables, riêng Preview và Production.
+2. Nhắn "Xong <tên dịch vụ>" kèm thông tin không bí mật ghi ở dòng Bàn giao.
+3. Script kiểm tra chỉ in biến nào có, biến nào thiếu và kết quả kết nối; không in giá trị, không mở `.env.local` để đọc. Qua thì đánh dấu xong.
+
+- [x] **GitHub:** repo `NguyenNTStudy/My_GoSplit`.
+- [ ] **Vercel** (GĐ0): import repo, Root Directory là `go-split`, Function Region là Singapore (`sin1`).
+  - Bàn giao: link cố định của project (`….vercel.app`). Kiểm tra: link mở được trang hiện tại.
+- [ ] **Neon** (GĐ0): project ở region Singapore; ngoài branch chính (Production) tạo thêm `dev` và `preview`.
+  - Bàn giao: `DATABASE_URL` (pooled) và `DIRECT_URL` của branch `dev`; tên project. Kiểm tra: kết nối và chạy `select 1`.
+- [ ] **Secret tự sinh** (GĐ0, không cần tài khoản): `BETTER_AUTH_SECRET`, `EDIT_SESSION_SECRET`, `IP_HASH_SALT`, `CONTACT_ENCRYPTION_KEY`, `CRON_SECRET`.
+  - Bản dev: Claude sinh ngẫu nhiên thẳng vào `.env.local`, không in ra. Bản Preview và Production: bạn tự sinh (ví dụ `openssl rand -base64 32`) và đặt trên Vercel, mỗi môi trường một giá trị.
+- [ ] **Google Cloud** (GĐ2): project, màn đồng ý OAuth (External), OAuth client loại Web; redirect URI `http://localhost:3000/api/auth/callback/google` và URI tương ứng trên link cố định của Vercel.
+  - Bàn giao: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; các redirect URI đã thêm. Kiểm tra: đủ biến; đăng nhập Google chạy được khi xong phần auth.
+- [ ] **Resend** (GĐ2): tài khoản và API key quyền gửi email.
+  - Bàn giao: `RESEND_API_KEY`; email đăng ký Resend (khi chưa có domain chỉ gửi được tới email này). Kiểm tra: gửi một email thử, bạn xác nhận đã nhận.
+- [ ] **Upstash Redis** (GĐ2): một database Redis ở region Singapore.
+  - Bàn giao: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`. Kiểm tra: lệnh `PING` trả về `PONG`.
+- [ ] **Domain** (trước GĐ2; GĐ0–GĐ1 dùng địa chỉ Vercel): mua domain, trỏ về Vercel, thêm bản ghi SPF, DKIM và DMARC mà Resend yêu cầu.
+  - Bàn giao: tên domain, `EMAIL_FROM` (ví dụ `Góp Gạo <no-reply@…>`). Kiểm tra: tra DNS các bản ghi; Resend báo Verified; gửi thử tới một email khác.
+- [ ] **Cloudflare R2** (GĐ3): bucket riêng tư (không bật public access), API token chỉ đọc ghi bucket đó.
+  - Bàn giao: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`. Kiểm tra: ghi, đọc, xóa một file thử; file không mở được bằng URL công khai.
+- [ ] **Cloudflare Turnstile** (GĐ8, cần domain): widget cho domain của app.
+  - Bàn giao: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`. Kiểm tra: xác minh một token thử với server của Cloudflare.
+
+### Dự án
+
+- [x] Chốt cấu trúc repo (code trong `go-split/`, Vercel đặt Root Directory là `go-split`), múi giờ (giờ địa phương của chuyến đi) và route tiếng Anh ngắn ([lộ trình](00-lo-trinh.md))
 - [x] Tạo project Next.js 16 + TypeScript + Tailwind 4 bằng create-next-app trong `go-split/`
-- [ ] Cấu hình ESLint, Prettier
-- [ ] Tạo cấu trúc thư mục, tách logic nghiệp vụ vào `src/domain` (TypeScript thuần, không phụ thuộc Next.js)
-- [ ] Cài shadcn/ui (Tailwind 4 đã có)
-- [ ] Cài Prisma, kết nối Neon (dùng pooled connection)
-- [ ] Cài Vitest và Playwright
-- [ ] CI với GitHub Actions: lint, typecheck, test
-- [ ] Deploy preview lên Vercel, cấu hình biến môi trường
+- [x] Cấu hình ESLint, Prettier: `eslint-config-next` (core-web-vitals, TypeScript) và đủ rule khuyến nghị của jsx-a11y; `src/domain` không được import Next.js, React hay Prisma; Prettier kèm plugin sắp xếp class Tailwind; script `lint`, `lint:fix`, `format`, `format:check`; cấu hình VS Code trong `.vscode/`
+- [x] Tạo cấu trúc thư mục: `app/` chuyển vào `src/app/`; thêm `src/domain` (TypeScript thuần, không phụ thuộc Next.js), `src/server`, `src/components`; alias `@/*` trỏ tới `src/`; `tailwindStylesheet` trong `.prettierrc.json` đổi theo. Các thư mục `messages/`, `prisma/`, `tests/e2e/`, `src/i18n/` và `src/proxy.ts` tạo ở task cài thư viện tương ứng
+- [x] Kiểm tra next-intl, Better Auth, Prisma, shadcn/ui hỗ trợ Next.js 16 và React 19.3 trước khi cài; kết quả và phiên bản ghi ở [lộ trình](00-lo-trinh.md)
+- [x] Cài shadcn/ui 4.23 (preset `base-nova`, component nền Base UI, `components.json`, `src/components/ui`, `src/lib/utils.ts`); gói `shadcn` để ở devDependencies vì chỉ cần lúc build CSS
+- [x] Cài Prisma 7.10.1 (CLI, client, adapter Neon): `prisma7.config.ts` đọc `.env*` như Next.js, migrate dùng `DIRECT_URL`; client sinh vào `src/server/generated/prisma` (không commit, `postinstall` tự sinh); `src/server/db.ts` dùng adapter Neon với `DATABASE_URL` (pooled)
+- [ ] Kết nối Neon và chạy thử `select 1` (chờ task tài khoản Neon)
+- [x] Cài Vitest 5 (môi trường Node cho `src/**/*.test.ts`, alias `@/` qua Vite) và Playwright 1.64 (Chromium, chạy mỗi bài trên điện thoại Pixel 7 và desktop; smoke test ở `tests/e2e`); script `test`, `test:watch`, `test:e2e`. Bộ test component (jsdom, Testing Library) cài khi có component đầu tiên cần test
+- [x] CI với GitHub Actions (`.github/workflows/ci.yml`): job check chạy `npm run lint`, `npm run typecheck` (`next typegen` rồi `tsc --noEmit`, vì Next.js 16 sinh kiểu route như `LayoutProps`), `npm run format:check`, `npm test`; job e2e build rồi chạy Playwright, lỗi thì tải `test-results` lên; Node 24 (`engines` trong `package.json`)
+- [x] Tạo `.env.example` liệt kê đủ biến môi trường theo giai đoạn, không có giá trị thật ([lộ trình](00-lo-trinh.md)); thêm `!.env.example` vào `go-split/.gitignore`
+- [ ] Deploy preview lên Vercel, cấu hình biến môi trường riêng cho Preview (branch Neon `preview`) và Production (branch chính)
 
 ## 3. Database
 
@@ -33,6 +64,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Bảng/field cho passcode lock, edit lock và email token của link mở khóa (R9)
 - [ ] Field `currency` (mã ISO 4217) của plan và hành trình; server chỉ nhận mã có trong danh sách tiền tệ, và chỉ cho đổi khi plan chưa có khoản chi, tiền đóng và tổng kết đang mở (R1, R72)
 - [ ] Field `summaryStatus` (`open`, `locked`, `final`) và `summaryStatusChangedAt` của plan; server chặn ghi Participant, Activity, Expense, ExpenseShare khi tổng kết đang `locked` hoặc `final`; không cho đổi khỏi `final` (R59)
+- [ ] Field `kind` của plan (`basic`, `detailed`) và ràng buộc theo loại: plan `basic` không có ngày, địa điểm, theme, ảnh nền; Expense và Contribution của plan `basic` không có `dateTime`; server từ chối Activity, Stay, FoodItem, RecruitPost, Itinerary cho plan `basic` (R93–R96)
 - [ ] Field `theme` của plan (R29)
 - [ ] Field `coverImage` của plan: đường dẫn ảnh và vùng hiển thị (R30)
 - [ ] `planId` dạng `VARCHAR`, sinh ngẫu nhiên 10 chữ số bằng crypto, trùng thì sinh lại (R4)
@@ -79,7 +111,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Rút gọn số tiền là bội số của 1.000: `k` trong tiếng Việt, `K` trong tiếng Anh, ở mọi nơi hiển thị kể cả ảnh xuất; ô nhập nhận hậu tố `k`/`K` (R74)
 - [ ] Dịch thông báo lỗi validation (Zod)
 - [ ] Gửi email theo ngôn ngữ người dùng đang dùng khi yêu cầu (R28)
-- [ ] Kiểm tra thiếu key dịch trong CI
+- [ ] Kiểm tra thiếu key dịch trong CI; bật rule ESLint chặn chữ viết cứng trong JSX (`react/jsx-no-literals`) sau khi cài next-intl
 
 ## 6. Theme
 

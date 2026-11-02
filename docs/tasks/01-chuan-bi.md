@@ -37,6 +37,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [x] Danh sách món ăn không gắn với ngày; mỗi món có một hoặc nhiều buổi (3 biểu tượng sáng, chiều, tối); lọc theo buổi (R33)
 - [x] Plan có 4 tab: Lịch trình, Ăn gì, Chi phí, Tổng kết; người tham gia mở từ số người ở đầu plan
 - [x] Kế hoạch dài tối đa 60 ngày, tính cả ngày đi và ngày về (R2)
+- [x] Hai loại kế hoạch chọn khi tạo: Cơ bản (chỉ chia tiền, không có ngày) và Kế hoạch chi tiết; không đổi loại sau khi tạo; quyền như nhau (R93–R96)
 - [x] Kế hoạch chỉ có ngày; hoạt động có ngày và giờ dự kiến, giờ tùy chọn; chỉ người có quyền chỉnh sửa được tạm khóa, mở khóa và chốt tổng kết (R59, R60)
 
 ## 1. Chốt giao diện
@@ -52,10 +53,17 @@ Tech stack và thứ tự làm: [README](README.md).
 - [x] Wireframe chiêu mộ: tab Chiêu mộ (K06, GD18), chi tiết tin (K07), xin đi cùng (K07b), chủ plan duyệt yêu cầu (G05c), đăng tin (G05d), ngừng chiêu mộ và chiêu mộ lại (G05e, G05f), số yêu cầu trên thẻ plan (G01)
 - [x] Wireframe desktop cho mọi màn điện thoại (GD1–GD50): danh sách plan, lịch trình (cột danh sách ngày, thả để chuyển ngày), nơi ở, ăn gì và khám phá món, chi phí, tổng kết (xem QR, chốt, đã chốt), người tham gia (menu từng người, link mời), chiêu mộ của chủ plan (duyệt, ngừng, đăng tin), cài đặt và ảnh nền, tạo plan 3 bước, tài khoản (đăng nhập, đăng ký, quên mật khẩu, hoàn tất, nhận lời mời), Bạn là ai và passcode, khám phá, gợi ý quán, chia sẻ và sao chép hành trình, báo cáo, trang người dùng, admin; form và bước xác nhận là hộp thoại giữa màn hình
 - [x] Wireframe bổ sung: duyệt yêu cầu xin đi cùng có chọn quyền (G05g, GD50), báo cáo người dùng (K05b, GD49), admin có loại Chiêu mộ và Người dùng (GD17), ô mô tả ngắn khi đăng gợi ý (G18), nhắc tối đa 60 ngày khi tạo plan (G02, GD7)
+- [x] Wireframe kế hoạch cơ bản: chọn loại (G02t, GD51), tạo kế hoạch cơ bản (G02c, GD52), chi phí, thêm chi phí, tổng kết không có ngày (G15e, G06b, G16e, GD53–GD55), thẻ Cơ bản trong danh sách (G01, GD1)
+- [x] Canvas sắp theo luồng: Sơ đồ luồng có mũi tên ở đầu; mỗi hàng một luồng, nhánh Kế hoạch chi tiết ngay dưới nhánh Cơ bản; màn web ở trang Gạo ấm · Web
 - [x] Wireframe QR chuyển khoản: bấm vào QR ở Tổng kết thì ảnh hiện lớn, chỉ có nút đóng; tải QR dùng bộ chọn ảnh của hệ thống, không có màn riêng (R54, R56)
 - [x] Wireframe quản lý nơi ở (danh sách, form sửa), báo cáo (dùng chung cho danh sách gợi ý và hành trình), trang admin (desktop), trang người dùng (điện thoại, desktop), nút tim trên thẻ Khám phá
 - [x] Wireframe Gợi ý quán ăn trên điện thoại: Khám phá trong tab Ăn gì, tìm theo điểm đến, xem danh sách gợi ý (tên hiển thị kèm huy hiệu tag), đăng danh sách gợi ý, áp dụng vào plan
 - [x] Wireframe Chia sẻ hành trình trên điện thoại: Khám phá ở màn hình Kế hoạch, tìm theo điểm đến, xem hành trình, nút chia sẻ trong tổng kết đã chốt, xem trước và sửa bản đăng, sao chép thành plan mới (chọn ngày đi), Khám phá trong tab Lịch trình và thêm vào lịch trình
+
+### Làm sau, song song với code
+
+Không chặn việc bắt đầu code; hạn chót của từng việc ghi ở [lộ trình](00-lo-trinh.md).
+
 - [ ] Màn hình kiểm tra chống bot khi vượt giới hạn truy cập
 - [ ] Chốt danh sách theme cho MVP (đề xuất: Gạo ấm, Biển, Núi rừng, Phố cổ, Đêm)
 - [ ] Chuẩn bị hình minh họa cho từng theme (tự vẽ, thuê vẽ hoặc mua từ thư viện có license dùng thương mại)

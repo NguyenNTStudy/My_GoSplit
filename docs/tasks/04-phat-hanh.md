@@ -9,6 +9,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] E2E tên plan: 50 ký tự lưu được, 51 ký tự bị từ chối, chữ có dấu gõ bằng bộ gõ khác nhau vẫn đếm đúng; số tiền tròn nghìn hiện `k` (tiếng Việt) và `K` (English); gõ `50k` ra `50.000`
 - [ ] E2E tiền tệ: tạo plan VND, nhập `50.000` và `50,000` đều ra năm mươi nghìn, `50,5` bị từ chối; chia `100.000 ₫` cho 3 người ra `34.000 ₫` mỗi người; plan USD làm tròn 0,5; tìm `nhat`, `yen`, `JPY` đều ra Yên Nhật; có khoản chi thì không đổi được tiền tệ; plan tạo sau được chọn sẵn tiền tệ của plan trước
 - [ ] E2E đăng nhập: đăng ký với tên hiển thị, username, email và mật khẩu; username trùng bị báo; đăng nhập bằng email và bằng username; xác nhận email, quên mật khẩu; đăng nhập Google lần đầu thì chọn username; chưa đăng nhập thì không tạo được plan
+- [ ] E2E kế hoạch cơ bản: chọn Cơ bản, tạo "Lẩu thứ 6" (VND) với 4 người; thêm Lẩu bò 640k (An trả, chia 4), Nước ngọt 120k (Bình trả, chia 4), Bia 180k (Chi trả, chia Bình, Chi, Dũng), Taxi 90k (Dũng trả, chia An, Dũng); tổng kết: An dư 405k, Bình thiếu 130k, Chi thiếu 70k, Dũng thiếu 205k; không có tab Lịch trình, Ăn gì; mở đường dẫn tab Ăn gì thì về Chi phí; chốt xong không có nút chia sẻ hành trình (R93–R96)
 - [ ] E2E độ dài plan: 60 ngày lưu được, 61 ngày bị từ chối cả ở form và ở API (R2)
 - [ ] E2E plan 10 ngày: thêm hoạt động vào Ngày 9 qua ô chọn ngày (phải cuộn danh sách); chuyển một hoạt động từ Ngày 1 sang Ngày 10 bằng nút "Chuyển"; danh sách ghi đúng số hoạt động mỗi ngày (R82); trên desktop, thả một hoạt động vào Ngày 10 ở cột danh sách ngày (R81)
 - [ ] E2E thứ tự hiển thị: thêm chi phí và hoạt động không theo thứ tự thời gian rồi kiểm tra danh sách sắp tăng dần, hoạt động không có giờ nằm cuối ngày, xóa giờ thì hoạt động xuống cuối ngày; lọc theo từng ngày; chi phí trước chuyến đi chỉ hiện ở "Tất cả"
@@ -37,6 +38,7 @@ Tech stack và thứ tự làm: [README](README.md).
 Requirements: [Dự kiến sau MVP](../requirements/README.md)
 
 - [ ] Liên kết món ăn với khoản chi phí
+- [ ] Chuyển kế hoạch cơ bản thành kế hoạch chi tiết
 - [ ] Trang "Quán được nhắc đến nhiều nhất" của mỗi khu vực
 - [ ] Trang người dùng: nhóm bài theo khu vực (MVP có trang người dùng cơ bản, R83)
 

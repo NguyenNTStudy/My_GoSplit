@@ -4,6 +4,9 @@ Tech stack và thứ tự làm: [README](README.md).
 
 ## 12. Kế hoạch (plan)
 
+- [ ] Màn chọn loại khi tạo kế hoạch: Cơ bản và Kế hoạch chi tiết, mỗi loại có mô tả, nhắc không đổi loại; chọn sẵn loại của kế hoạch tạo gần nhất (R93)
+- [ ] Tạo kế hoạch cơ bản hai bước: Thông tin (tên, tiền tệ, thêm nhanh tên người tham gia, mô tả ngắn tối đa 100 ký tự) và Passcode (R95)
+- [ ] Màn kế hoạch cơ bản: phần đầu gọn không có hình, mô tả ngắn dưới tên, nhãn Cơ bản; thẻ trong danh sách có mô tả ngắn một dòng; hai tab Chi phí và Tổng kết; đường dẫn tới tab không có thì về Chi phí; không có nút chia sẻ hành trình, chiêu mộ, theme, ảnh nền (R94)
 - [ ] Tạo plan: tên (1–50 ký tự, hiện số ký tự còn lại khi gần hết, R73), địa điểm, ngày bắt đầu/kết thúc, tiền tệ, ghi chú, theme, passcode (cần đăng nhập, R61); tiền tệ được chọn sẵn, hiện ký hiệu, mã và tên, đổi qua bộ chọn (R1, R70)
 - [ ] Bộ chọn tiền tệ: ô tìm theo mã, tên tiền tệ, tên nước, ký hiệu; khi chưa gõ thì hiện tiền tệ đã dùng gần đây, nhóm phổ biến, rồi toàn bộ theo chữ cái; tìm không ra thì giữ tiền tệ đang chọn (R71)
 - [ ] Đổi tiền tệ trong cài đặt plan khi chưa có khoản chi, tiền đóng và tổng kết đang mở; ngoài trường hợp đó thì khóa ô kèm lời giải thích (R72)
@@ -72,6 +75,7 @@ Tech stack và thứ tự làm: [README](README.md).
 - [ ] Cảnh báo chi phí có người đã rời; sửa chi phí đó cần thao tác xác nhận riêng (R21)
 - [ ] Tính lại kết quả khi thêm, sửa, xóa chi phí hoặc tiền đóng (R20)
 - [ ] Màn Chi phí có hai danh sách Khoản chi và Tiền đóng, mỗi bên hiện tổng; tiền đóng theo ngày giờ tăng dần, khoản ghi cùng lúc hiện thành nhóm; sửa, xóa từng khoản (R60, R75)
+- [ ] Kế hoạch cơ bản: form chi phí và ghi tiền đóng không có ngày giờ, không có hoạt động liên kết; danh sách theo thứ tự ghi, không có bộ chọn ngày; danh sách kế hoạch xếp kế hoạch cơ bản theo ngày tạo, thẻ có nhãn Cơ bản; thẻ preview không có ngày, ảnh xuất ghi mô tả ngắn thay cho ngày (R96)
 - [ ] Form "Ghi tiền đóng": ngày giờ, ghi chú, tích người (mặc định mọi người đang hoạt động), hai chế độ Cùng số tiền / Mỗi người một số, hiện tổng trước khi lưu (R75)
 
 ## 18. Tổng kết và chia sẻ

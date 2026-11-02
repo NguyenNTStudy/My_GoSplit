@@ -1,6 +1,6 @@
 # 02 — Người tham gia, chi phí và tổng kết
 
-Tiền tệ của kế hoạch, người tham gia, câu hỏi "Bạn là ai?", chi phí và cách chia, làm tròn, tiền đóng, tổng kết, người thu tiền và QR chuyển khoản.
+Tiền tệ của kế hoạch, người tham gia, câu hỏi "Bạn là ai?", chi phí và cách chia, làm tròn, tiền đóng, tổng kết, người thu tiền và QR chuyển khoản. Module này áp dụng cho cả kế hoạch cơ bản ([R94](09-ke-hoach-co-ban.md)), trừ phần ngày giờ ([R96](09-ke-hoach-co-ban.md)).
 
 Liên quan: [01 Kế hoạch và quyền truy cập](01-ke-hoach-va-quyen-truy-cap.md) · [03 Lịch trình, nơi ở và danh sách món ăn](03-lich-trinh-noi-o-mon-an.md) · [Tổng quan](README.md)
 

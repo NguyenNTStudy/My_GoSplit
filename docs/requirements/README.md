@@ -2,14 +2,16 @@
 
 ## Tổng quan
 
-Góp Gạo (tên tiếng Anh: GoSplit) là một ứng dụng trực tuyến để lập kế hoạch chuyến đi và theo dõi các khoản chi phí chung. Một kế hoạch bao gồm lịch trình chuyến đi, người tham gia, các khoản chi phí và bản tổng kết chuyến đi. Người tạo kế hoạch phải đăng nhập; người xem qua link và người chỉnh sửa bằng passcode không cần tài khoản. Kế hoạch có thể truy cập trên nhiều thiết bị.
+Góp Gạo (tên tiếng Anh: GoSplit) là một ứng dụng trực tuyến để lập kế hoạch chuyến đi và theo dõi các khoản chi phí chung. Kế hoạch có hai loại, chọn khi tạo: kế hoạch chi tiết cho chuyến đi, gồm lịch trình, người tham gia, các khoản chi phí và bản tổng kết; và kế hoạch cơ bản chỉ để chia tiền cho một việc ngắn như một bữa ăn. Người tạo kế hoạch phải đăng nhập; người xem qua link và người chỉnh sửa bằng passcode không cần tài khoản. Kế hoạch có thể truy cập trên nhiều thiết bị.
 
 MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có Gợi ý quán ăn từ cộng đồng: người địa phương đăng món ăn và quán ăn của một khu vực, người đi du lịch áp dụng vào danh sách món ăn của kế hoạch. MVP cũng có Chia sẻ hành trình: chủ kế hoạch chia sẻ lịch trình, nơi ở, món ăn và chi phí ước tính của một chuyến đi đã chốt, để mọi người tham khảo và sao chép thành kế hoạch của mình.
 
 ## Thuật ngữ
 
 - **MVP** (Minimum Viable Product): bản phát hành đầu tiên, chỉ gồm các tính năng cần thiết nhất, tức mọi thứ trong mục "Trong phạm vi" bên dưới.
-- **Kế hoạch** (plan): một chuyến đi, gồm lịch trình, người tham gia, chi phí, nơi ở, danh sách món ăn và bản tổng kết.
+- **Kế hoạch** (plan): đơn vị chính của ứng dụng, có hai loại chọn khi tạo ([09](09-ke-hoach-co-ban.md)).
+- **Kế hoạch chi tiết**: một chuyến đi, gồm lịch trình, người tham gia, chi phí, nơi ở, danh sách món ăn và bản tổng kết.
+- **Kế hoạch cơ bản**: chỉ để chia tiền cho một việc ngắn như một bữa ăn; gồm người tham gia, chi phí, tiền đóng và tổng kết, không có ngày.
 - **Chủ kế hoạch**: người đã đăng nhập và tạo kế hoạch. Mọi kế hoạch đều có chủ.
 - **Người xem**: người có link chia sẻ của kế hoạch.
 - **Người có quyền chỉnh sửa**: người đã nhập đúng passcode trên thiết bị, hoặc chủ kế hoạch.
@@ -44,6 +46,11 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 - Chủ kế hoạch đổi passcode ngay trong cài đặt của kế hoạch.
 - Hỗ trợ lưu trữ trực tuyến và xem/chỉnh sửa từ nhiều thiết bị.
 - Hiển thị các danh sách có ngày giờ theo thời gian tăng dần; lịch trình và chi phí xem được theo "Tất cả" hoặc từng ngày.
+
+**Kế hoạch cơ bản** ([09](09-ke-hoach-co-ban.md))
+
+- Khi tạo kế hoạch, chọn một trong hai loại: Cơ bản hoặc Kế hoạch chi tiết, mỗi loại có mô tả; không đổi loại sau khi tạo.
+- Kế hoạch cơ bản chỉ có người tham gia, khoản chi, tiền đóng và tổng kết; không có ngày, theme, lịch trình, nơi ở, ăn gì, chia sẻ hành trình hay chiêu mộ. Quyền xem và sửa giống kế hoạch chi tiết.
 
 **Người tham gia, chi phí và tổng kết** ([02](02-nguoi-tham-gia-va-chi-phi.md))
 
@@ -114,6 +121,7 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 ### Dự kiến sau MVP
 
 - Liên kết món ăn với khoản chi phí.
+- Chuyển kế hoạch cơ bản thành kế hoạch chi tiết.
 - Trang người dùng nhóm bài theo khu vực (MVP có trang người dùng cơ bản, [R83](04-goi-y-quan-an.md)).
 - Đánh giá bạn đồng hành sau chuyến đi; gợi ý ghép nhóm theo điểm đến và ngày trùng nhau ([08](08-chieu-mo.md)).
 - Trang "Quán được nhắc đến nhiều nhất" của mỗi khu vực, gộp từ nhiều danh sách.
@@ -134,12 +142,13 @@ MVP không bao gồm tính năng phân tích dựa trên AI hoặc LLM. MVP có 
 | [06 Bảo vệ dữ liệu và chống crawl](06-bao-mat-du-lieu.md) | Chống crawl, noindex, giới hạn lượt đọc | R46–R53 |
 | [07 Chia sẻ hành trình](07-chia-se-hanh-trinh.md) | Chia sẻ hành trình của kế hoạch đã chốt, tìm, sao chép thành kế hoạch mới hoặc vào kế hoạch đang có, báo cáo | R63–R69, R79 |
 | [08 Chiêu mộ bạn đồng hành](08-chieu-mo.md) | Tin chiêu mộ, tab Chiêu mộ, xin đi cùng, duyệt, thông tin liên hệ, báo cáo và chặn | R86–R92 |
+| [09 Kế hoạch cơ bản](09-ke-hoach-co-ban.md) | Hai loại kế hoạch, kế hoạch cơ bản chỉ chia tiền, không có ngày | R93–R96 |
 
 ## Quy ước
 
 - Tên các trường trong phần Dữ liệu của mỗi module mang tính khái niệm và có thể được điều chỉnh khi triển khai.
 - Mỗi module gồm: Dữ liệu → Quy tắc → Acceptance Criteria → Edge Cases.
-- Mã rule không đổi khi chuyển giữa các file. Rule mới lấy số tiếp theo (hiện là R93), ghi vào đúng module và cập nhật bảng trên.
+- Mã rule không đổi khi chuyển giữa các file. Rule mới lấy số tiếp theo (hiện là R97), ghi vào đúng module và cập nhật bảng trên.
 - Mỗi file giữ dưới khoảng 200 dòng; module dài hơn thì tách tiếp.
 - Data model (ERD): [data-model](../data-model/README.md).
 - Công việc triển khai: [tasks](../tasks/README.md).

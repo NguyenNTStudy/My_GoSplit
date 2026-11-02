@@ -33,13 +33,14 @@ erDiagram
   Plan {
     String planId PK "10 chữ số ngẫu nhiên (R4)"
     String shareKey UK "khóa trong link chia sẻ (R3)"
+    String kind "basic hoặc detailed, đặt khi tạo, không đổi (R93)"
     String name "1 đến 50 ký tự, đếm theo NFC (R73)"
-    String location
-    DateTime startDate "chỉ ngày"
-    DateTime endDate "chỉ ngày, không trước startDate, tối đa 60 ngày (R2)"
-    String notes "tùy chọn"
+    String location "trống với basic"
+    DateTime startDate "chỉ ngày; trống với basic"
+    DateTime endDate "chỉ ngày, không trước startDate, tối đa 60 ngày (R2); trống với basic"
+    String notes "tùy chọn; với basic là mô tả ngắn, tối đa 100 ký tự (R94)"
     String currency "mã ISO 4217, ví dụ VND (R1, R70, R72)"
-    String theme "mã theme, mặc định Gạo ấm (R29)"
+    String theme "mã theme, mặc định Gạo ấm (R29); trống với basic"
     String coverImagePath "tùy chọn, storage riêng tư (R30)"
     Json coverImageCrop "vùng ảnh hiển thị"
     String ownerId FK "Account, bắt buộc (R61)"
@@ -104,7 +105,7 @@ erDiagram
     String participantId FK "người đóng hoặc được trả lại (R75)"
     String kind "contribution hoặc refund (R23)"
     Decimal amount "NUMERIC(14,3), lớn hơn 0 (R18)"
-    DateTime dateTime
+    DateTime dateTime "trống với kế hoạch basic (R96)"
     String note "tùy chọn, ví dụ Đợt 1"
     String batchId "chung cho các khoản ghi cùng lúc (R75)"
     DateTime createdAt "dùng khi trùng ngày giờ"
@@ -123,7 +124,7 @@ erDiagram
     String description
     Decimal amount "NUMERIC(14,3), lớn hơn 0 (R14, R18)"
     String paidByParticipantId FK "R15"
-    DateTime dateTime
+    DateTime dateTime "trống với kế hoạch basic (R96)"
     String notes "tùy chọn"
     String activityId FK "tùy chọn (R25)"
     DateTime createdAt "dùng khi trùng ngày giờ (R60)"
