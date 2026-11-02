@@ -18,6 +18,7 @@ export const NOINDEX_SOURCES = [
   "/welcome",
   "/forgot-password",
   "/reset-password",
+  "/unlock/:path*",
   "/dev/:path*",
 ];
 
@@ -39,10 +40,11 @@ export function securityHeaders() {
       source,
       headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
     })),
-    {
-      // The plan address holds its share key: never send it to other sites (R50).
-      source: "/p/:path*",
+    // These addresses hold a secret (share key, email token): never send them to other
+    // sites (R50).
+    ...["/p/:path*", "/unlock/:path*"].map((source) => ({
+      source,
       headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
-    },
+    })),
   ];
 }

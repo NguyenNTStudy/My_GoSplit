@@ -82,5 +82,35 @@
       "invalid": "The passcode is exactly 6 digits.",
       "weak": "This passcode is easy to guess. You can still use it, but a different one is safer."
     }
+  },
+  "email": {
+    "greeting": "Hi {name},",
+    "fallback": "If the button doesn't work, open this link:",
+    "footer": "Automatic email from {app}. Please don't reply.",
+    "verify": {
+      "subject": "Confirm your email for {app}",
+      "body": "Tap the button below to confirm your email and start using {app}.",
+      "action": "Confirm email",
+      "ignore": "If you didn't sign up, you can ignore this email."
+    },
+    "reset": {
+      "subject": "Reset your {app} password",
+      "body": "Someone asked to reset the password of your account.",
+      "action": "Reset password",
+      "ignore": "If it wasn't you, ignore this email. Your password stays the same."
+    },
+    "unlock": {
+      "subject": "Passcode entry for “{plan}” is paused",
+      "body": "Someone entered a wrong passcode for “{plan}” 5 times in a row, so passcode entry is paused for 12 hours.",
+      "action": "Unlock now",
+      "note": "You and everyone who can already edit keep editing as usual. If you don't know who tried, change the passcode in the plan settings."
+    }
+  },
+  "unlock": {
+    "title": "Unlock passcode entry",
+    "body": "Unlocking lets people enter this plan's passcode again.",
+    "button": "Unlock",
+    "done": "Unlocked. People can enter the passcode again.",
+    "invalid": "This link was already used or has expired. The lock ends by itself after 12 hours."
   }
 }

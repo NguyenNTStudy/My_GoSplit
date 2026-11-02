@@ -179,6 +179,9 @@ describe("tài khoản (Better Auth)", () => {
     expect(s.sent).toMatchObject([
       { kind: "reset-password", to: "an@example.com", locale: "vi" },
     ]);
+    // The token in the link is stored only as a hash (task 10).
+    const token = new URL(s.sent[0].url).pathname.split("/").at(-1)!;
+    expect(JSON.stringify(s.db.verification)).not.toContain(token);
   });
 
   it("R61 tài khoản tạo bằng Google đặt được mật khẩu qua email, vẫn là một tài khoản; chưa có username", async () => {

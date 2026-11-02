@@ -48,3 +48,13 @@ test.describe("header bảo mật và chống lập chỉ mục", () => {
     expect(robots.toLowerCase()).not.toContain("sitemap");
   });
 });
+
+test("R9 trang mở khóa: noindex, không gửi referrer, chỉ mở khóa khi bấm nút", async ({
+  page,
+}) => {
+  const response = await page.goto("/unlock/some-token");
+  expect(response?.headers()["x-robots-tag"]).toBe("noindex, nofollow");
+  expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("button")).toBeVisible();
+});

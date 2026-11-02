@@ -82,5 +82,35 @@
       "invalid": "Passcode gồm đúng 6 chữ số.",
       "weak": "Passcode này dễ đoán. Bạn vẫn dùng được, nhưng nên chọn số khác."
     }
+  },
+  "email": {
+    "greeting": "Chào {name},",
+    "fallback": "Nếu nút không bấm được, mở link này:",
+    "footer": "Email tự động từ {app}, vui lòng không trả lời.",
+    "verify": {
+      "subject": "Xác nhận email cho {app}",
+      "body": "Bấm nút bên dưới để xác nhận email và bắt đầu dùng {app}.",
+      "action": "Xác nhận email",
+      "ignore": "Nếu bạn không đăng ký tài khoản, hãy bỏ qua email này."
+    },
+    "reset": {
+      "subject": "Đặt lại mật khẩu {app}",
+      "body": "Có người vừa yêu cầu đặt lại mật khẩu cho tài khoản của bạn.",
+      "action": "Đặt lại mật khẩu",
+      "ignore": "Nếu không phải bạn, hãy bỏ qua email này. Mật khẩu vẫn giữ nguyên."
+    },
+    "unlock": {
+      "subject": "Kế hoạch “{plan}” đang tạm khóa nhập passcode",
+      "body": "Có người nhập sai passcode của kế hoạch “{plan}” 5 lần liên tiếp, nên việc nhập passcode bị khóa 12 giờ.",
+      "action": "Mở khóa ngay",
+      "note": "Bạn và những người đã có quyền sửa vẫn sửa được như bình thường. Nếu không biết ai đã thử, hãy đổi passcode trong cài đặt kế hoạch."
+    }
+  },
+  "unlock": {
+    "title": "Mở khóa nhập passcode",
+    "body": "Mở khóa thì mọi người lại nhập được passcode của kế hoạch này.",
+    "button": "Mở khóa",
+    "done": "Đã mở khóa. Mọi người có thể nhập passcode lại.",
+    "invalid": "Link đã được dùng hoặc đã hết hạn. Khóa tự hết sau 12 giờ."
   }
 }

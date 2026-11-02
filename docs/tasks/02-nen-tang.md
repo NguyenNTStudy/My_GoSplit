@@ -77,7 +77,7 @@ Schema ở `go-split/prisma/schema.prisma`, migration đầu tiên ở `prisma/m
 - [x] Index: `(ownerId, startDate)`, `(planId, dateTime)` của Expense, `(planId, date, time)` của Activity, `(planId, order)` của FoodItem, các khóa ngoại `planId` (R33, R60)
 - [x] Xóa plan thì xóa cascade toàn bộ dữ liệu con (R22); trigger chặn xóa hẳn người tham gia còn khoản chi, phần chia, tiền đóng hoặc là chủ, người thu tiền khi plan vẫn còn (R13)
 - [x] Cập nhật `plan.updatedAt` khi bất kỳ dữ liệu con nào thay đổi (trigger trên người tham gia, tiền đóng, QR, khoản chi, phần chia, hoạt động, nơi ở, món ăn)
-- [ ] Seed data cho môi trường dev (cần hàm băm passcode ở mục 8 và database Neon)
+- [ ] Seed data cho môi trường dev (hàm băm passcode đã có ở mục 8; chờ database Neon)
 
 ## 4. Logic nghiệp vụ (`src/domain`)
 
@@ -116,7 +116,7 @@ TypeScript thuần, không phụ thuộc Next.js, React hay Prisma; mỗi file c
 - [x] Định dạng số tiền theo ngôn ngữ và tiền tệ của plan bằng `Intl.NumberFormat` (ký hiệu ngắn, chỉ hiện phần lẻ khi tiền tệ có phần lẻ); nhận đúng dấu thập phân khi nhập (`,` hoặc `.`); tiền tệ không có phần lẻ thì `.` và `,` đều là dấu phân cách hàng nghìn (R1, R18, R28): `formatMoney` trong `src/i18n/format.ts` (ký hiệu lấy từ danh sách tiền tệ nên giống nhau ở hai ngôn ngữ), `parseAmountInput` trong `src/domain/amount-input.ts`
 - [x] Rút gọn số tiền là bội số của 1.000: `k` trong tiếng Việt, `K` trong tiếng Anh, ở mọi nơi hiển thị kể cả ảnh xuất; ô nhập nhận hậu tố `k`/`K` (R74)
 - [x] Dịch thông báo lỗi validation (Zod): `src/i18n/validation.ts`; câu lỗi của Zod theo ngôn ngữ từng lần kiểm tra (không đặt cấu hình chung cho server), câu lỗi riêng của schema và mã lỗi của `src/domain` là key `validation.*` trong file dịch
-- [ ] Gửi email theo ngôn ngữ người dùng đang dùng khi yêu cầu (R28; làm cùng mục 10)
+- [x] Gửi email theo ngôn ngữ người dùng đang dùng khi yêu cầu (R28): email xác nhận và đặt lại mật khẩu theo cookie ngôn ngữ của thiết bị gửi yêu cầu, rồi ngôn ngữ trình duyệt, rồi ngôn ngữ của account; email mở khóa theo ngôn ngữ của chủ plan
 - [x] Kiểm tra thiếu key dịch trong CI; bật rule ESLint chặn chữ viết cứng trong JSX (`react/jsx-no-literals`) sau khi cài next-intl: `src/i18n/i18n.test.ts` so key, biến trong câu và mã lỗi của domain giữa hai file dịch (chạy trong `npm test`); rule ESLint áp cho `src/app` và `src/components` (trừ `ui/` của shadcn)
 
 ## 6. Theme
@@ -172,7 +172,7 @@ TypeScript thuần, không phụ thuộc Next.js, React hay Prisma; mỗi file c
 - [x] Phiên edit bằng httpOnly cookie có ký, gắn với `planId` và phiên bản passcode: `src/server/edit-session.ts`, cookie `edit_{planId}` ký HMAC bằng `EDIT_SESSION_SECRET`, kèm mã thiết bị cho edit lock (R8); giữ một năm, đổi passcode là hết hiệu lực. Đặt và đọc cookie khi làm màn nhập passcode
 - [x] "Bạn là ai?": tìm người tham gia gắn với tài khoản qua PlanMember trước, rồi mới tới lựa chọn lưu trên thiết bị (R26, R27): `resolveCurrentParticipant` (`src/domain/current-participant.ts`); chỉ hỏi người có quyền sửa; đã bỏ qua thì không hỏi lại; người đã chọn không còn hoạt động thì hỏi lại. Màn hỏi làm ở mục 13
 - [x] Phân quyền: xem (ai có link), chỉnh sửa (có passcode hoặc chủ account), xóa (chỉ chủ plan) (R3, R7); gom vào một hàm trong `src/domain` đọc PlanMember, phiên passcode và khóa chia sẻ, mọi API đều gọi hàm này, có test theo bảng quyền, gồm quyền Sửa và Xem của thành viên; nhập passcode không đổi quyền của tài khoản (R84): `planPermissions` (`src/domain/permissions.ts`), test theo bảng ở `permissions.test.ts`; thiết bị có quyền sửa vẫn mở được plan sau khi đổi khóa chia sẻ (để chuyển sang link mới, R3). Các API gọi hàm này khi được viết, từ mục 12
-- [ ] Sai passcode 5 lần liên tiếp thì khóa nhập passcode của plan 12 giờ; thiết bị đã có quyền edit không bị ảnh hưởng (R9): logic xong ở `afterPasscodeAttempt`, `isPasscodeLocked` (`src/domain/passcode.ts`); còn API nhập passcode cập nhật số lần sai trong một câu lệnh SQL (để hai lần nhập cùng lúc không bị đếm thiếu), và email mở khóa (mục 10)
+- [x] Sai passcode 5 lần liên tiếp thì khóa nhập passcode của plan 12 giờ; thiết bị đã có quyền edit không bị ảnh hưởng (R9): `enterPasscode` (`src/server/passcode-entry.ts`) khóa dòng plan trong lúc đếm nên hai lần nhập cùng lúc đều được đếm; trong lúc khóa không kiểm tra passcode; chủ plan và thiết bị đã có cookie sửa không đi qua bước này. Màn nhập passcode gọi hàm này và đặt cookie sửa (mục 12)
 - [x] Quyền admin: chỉ account được chỉ định mới vào được trang admin; account bị khóa không đăng, thả tim hay báo cáo được (R44): `isAdmin`, `canUseCommunity` (`src/domain/account.ts`). Không dùng admin plugin của Better Auth vì khóa tài khoản ở đó chặn cả đăng nhập, còn R44 chỉ chặn đăng, thả tim, báo cáo; Better Auth vẫn đọc các cột `role`, `banned`, `banExpires`. Chỉ định admin bằng cách đặt `role = admin` trong database; trang admin ở mục 21
 
 ## 9. Bảo mật dữ liệu và chống crawl
@@ -200,17 +200,19 @@ Header ở `src/lib/security-headers.ts` (áp qua `next.config.ts`), phần serv
 
 ## 10. Email và đổi passcode
 
-- [ ] Tích hợp Resend và tạo template email (tiếng Việt và English): xác nhận email tài khoản, đặt lại mật khẩu, mở khóa nhập passcode
-- [ ] Email mở khóa: tối đa một email cho mỗi lần khóa, mở link thì gỡ khóa ngay (R9)
-- [ ] Chủ plan đổi passcode trong cài đặt plan, không cần link email (R11)
-- [ ] Sau khi đổi passcode: vô hiệu phiên edit cũ, gỡ khóa nhập passcode (R11)
-- [ ] Token trong email: dùng một lần, có hạn, lưu dạng hash
-- [ ] Email chiêu mộ: yêu cầu mới cho chủ plan (gộp tối đa một email mỗi giờ), duyệt, từ chối, hết hạn cho người gửi; tắt được trong tài khoản (R90)
+Các bước cần chạy nguyên khối (đếm passcode sai, token trong email, edit lock) viết bằng SQL qua interface `Sql` (`src/server/sql.ts`): app chạy trên Prisma, test chạy trên Postgres trong bộ nhớ (PGlite) đã áp đủ migration (`src/server/testing/database.ts`), nên test được khi chưa có Neon. PGlite chỉ có một kết nối nên test "cùng lúc" chạy lần lượt; việc chặn tranh chấp dựa vào `UPDATE` có điều kiện và `SELECT … FOR UPDATE` của Postgres.
+
+- [x] Tích hợp Resend và tạo template email (tiếng Việt và English): xác nhận email tài khoản, đặt lại mật khẩu, mở khóa nhập passcode: gửi qua API của Resend bằng `fetch`, không cần thư viện (`src/server/email.ts`); template ở `src/server/email-templates.ts`, chữ lấy từ namespace `email` của file dịch, có bản chữ thường và HTML, tên do người dùng nhập được escape. Chưa có `RESEND_API_KEY`, `EMAIL_FROM` thì dev in email ra log, production báo lỗi. Gửi thử thật làm ở task tài khoản Resend (mục 2)
+- [x] Email mở khóa: tối đa một email cho mỗi lần khóa, mở link thì gỡ khóa ngay (R9): `enterPasscode`, `unlockWithToken` (`src/server/passcode-entry.ts`); email gửi đúng lúc khóa (ghi `unlockEmailSentAt`), tới email tài khoản của chủ plan, theo ngôn ngữ của chủ plan. Link mở trang `/unlock/{token}`; phải bấm nút mới gỡ khóa, để trình quét link của hộp thư không tự mở khóa. Link hết hạn cùng lúc khóa tự hết
+- [ ] Chủ plan đổi passcode trong cài đặt plan, không cần link email (R11): đã có `changePasscode`; màn cài đặt plan và kiểm tra quyền chủ plan (`planPermissions(...).changePasscode`) làm ở mục 12
+- [x] Sau khi đổi passcode: vô hiệu phiên edit cũ, gỡ khóa nhập passcode (R11): `changePasscode` tăng phiên bản passcode (cookie sửa cũ hết quyền), gỡ khóa và xóa link mở khóa chưa dùng; có test
+- [x] Token trong email: dùng một lần, có hạn, lưu dạng hash: token mở khóa 256 bit, lưu SHA-256 (`src/server/email-token.ts`), dùng xong đánh dấu `usedAt`; token đặt lại mật khẩu của Better Auth cũng lưu dạng hash (`storeIdentifier: "hashed"`); link xác nhận email của Better Auth là token có chữ ký và hạn dùng, không lưu trong database
+- [ ] Email chiêu mộ: yêu cầu mới cho chủ plan (gộp tối đa một email mỗi giờ), duyệt, từ chối, hết hạn cho người gửi; tắt được trong tài khoản (R90): làm cùng mục 22 và 23; cần thêm cột ghi lần gửi email gộp gần nhất (schema chưa có)
 
 ## 11. Edit lock
 
-- [ ] Lấy edit lock khi vào chế độ chỉnh sửa (R8)
-- [ ] Gửi heartbeat khoảng 30 giây một lần khi người dùng còn thao tác; nhả lock khi thoát hoặc sau 5 phút không thao tác
-- [ ] Màn hình chỉ xem kèm thông báo đang có người chỉnh sửa
-- [ ] Server kiểm tra lock ở mọi API ghi; từ chối lưu khi lock đã hết hạn
-- [ ] Xử lý đóng tab và mất kết nối
+- [x] Lấy edit lock khi vào chế độ chỉnh sửa (R8): `acquireEditLock` (`src/server/edit-lock.ts`), một câu `UPDATE` có điều kiện nên hai thiết bị cùng vào chỉ một người được; người giữ lock vào lại vẫn giữ. Người giữ lock là một mã do màn sửa tạo, đề xuất mỗi tab một mã (cùng một người mở hai tab thì tab sau chỉ xem). Màn sửa gọi hàm này ở mục 12
+- [ ] Gửi heartbeat khoảng 30 giây một lần khi người dùng còn thao tác; nhả lock khi thoát hoặc sau 5 phút không thao tác: phía server xong: `renewEditLock` gia hạn 5 phút, `releaseEditLock` chỉ người giữ nhả được, lock hết hạn 5 phút sau lần gia hạn cuối. Còn phía trình duyệt: gửi heartbeat 30 giây một lần khi có thao tác kể từ lần trước, làm cùng màn sửa (mục 12)
+- [ ] Màn hình chỉ xem kèm thông báo đang có người chỉnh sửa: `acquireEditLock` trả thời điểm lock hết để hiện trong thông báo; màn hình làm ở mục 12
+- [x] Server kiểm tra lock ở mọi API ghi; từ chối lưu khi lock đã hết hạn: `renewEditLock` vừa kiểm tra vừa gia hạn; lock đã hết hạn thì từ chối kể cả khi chưa ai lấy, để không ghi đè âm thầm. Mỗi API ghi gọi hàm này trong transaction của nó, từ mục 12
+- [ ] Xử lý đóng tab và mất kết nối: phía server: tab đóng hay mất mạng thì lock tự hết sau 5 phút. Còn phía trình duyệt: nhả lock bằng `navigator.sendBeacon` khi đóng tab; có mạng lại thì xin lock lại, mất lock thì chuyển về chỉ xem; làm cùng màn sửa (mục 12)

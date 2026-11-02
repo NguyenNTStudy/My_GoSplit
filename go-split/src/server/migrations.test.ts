@@ -1,28 +1,14 @@
 // Applies prisma/migrations to an in-memory Postgres (PGlite) and checks the rules that live
 // in SQL rather than in the Prisma schema: CHECK constraints, triggers, cascades, extensions.
-import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
-
-import { PGlite } from "@electric-sql/pglite";
-import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
-import { unaccent } from "@electric-sql/pglite/contrib/unaccent";
+import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const MIGRATIONS = path.join(process.cwd(), "prisma", "migrations");
+import { migratedDatabase } from "./testing/database";
 
 let db: PGlite;
 
 beforeAll(async () => {
-  db = await PGlite.create({ extensions: { pg_trgm, unaccent } });
-  const folders = readdirSync(MIGRATIONS, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
-  for (const folder of folders) {
-    await db.exec(
-      readFileSync(path.join(MIGRATIONS, folder, "migration.sql"), "utf8"),
-    );
-  }
+  db = await migratedDatabase();
   await db.exec(`
     INSERT INTO "User" ("id", "name", "email", "userTag", "publicId", "updatedAt")
     VALUES ('u1', 'An', 'an@example.com', '4821', 'k3m9q2x7v1ab', now());

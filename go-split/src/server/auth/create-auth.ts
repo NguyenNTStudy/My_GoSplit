@@ -24,6 +24,7 @@ import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
   isLocale,
+  negotiateLocale,
   resolveLocale,
 } from "@/i18n/config";
 
@@ -32,6 +33,7 @@ export type AuthEmail = {
   to: string;
   url: string;
   locale: Locale;
+  name: string;
 };
 
 export type AuthSetup = {
@@ -42,11 +44,23 @@ export type AuthSetup = {
   google?: { clientId: string; clientSecret: string };
 };
 
-/** Emails go out in the account's language (R28). */
-const userLocale = (user: object): Locale =>
-  "language" in user && isLocale(user.language)
+/**
+ * Emails go out in the language in use when they were asked for (R28): this device's choice,
+ * then the browser's languages, then the account's language.
+ */
+function emailLocale(user: object, request: Request | undefined): Locale {
+  const saved = request?.headers
+    .get("cookie")
+    ?.split(";")
+    .map((part) => part.trim().split("="))
+    .find(([name]) => name === LOCALE_COOKIE)?.[1];
+  if (isLocale(saved)) return saved;
+  const browser = request?.headers.get("accept-language");
+  if (browser) return negotiateLocale(browser);
+  return "language" in user && isLocale(user.language)
     ? user.language
     : DEFAULT_LOCALE;
+}
 
 function invalidInput(code: string, message: string): never {
   throw new APIError("BAD_REQUEST", { code, message });
@@ -65,24 +79,26 @@ export function createAuth(setup: AuthSetup) {
       // before it can create a plan (R61).
       requireEmailVerification: true,
       revokeSessionsOnPasswordReset: true,
-      sendResetPassword: ({ user, url }) =>
+      sendResetPassword: ({ user, url }, request) =>
         setup.sendEmail({
           kind: "reset-password",
           to: user.email,
           url,
-          locale: userLocale(user),
+          locale: emailLocale(user, request),
+          name: user.name,
         }),
     },
     emailVerification: {
       sendOnSignUp: true,
       sendOnSignIn: true,
       autoSignInAfterVerification: true,
-      sendVerificationEmail: ({ user, url }) =>
+      sendVerificationEmail: ({ user, url }, request) =>
         setup.sendEmail({
           kind: "verify-email",
           to: user.email,
           url,
-          locale: userLocale(user),
+          locale: emailLocale(user, request),
+          name: user.name,
         }),
     },
     socialProviders: setup.google
@@ -93,6 +109,10 @@ export function createAuth(setup: AuthSetup) {
       // only links to an account whose email is already confirmed, so nobody can claim an
       // address by registering it first.
       accountLinking: { enabled: true, trustedProviders: ["google"] },
+    },
+    verification: {
+      // Email confirmation and password reset tokens are stored hashed, like our own (task 10).
+      storeIdentifier: "hashed",
     },
     session: {
       // Pages read the session from a signed cookie for 5 minutes instead of the database.
