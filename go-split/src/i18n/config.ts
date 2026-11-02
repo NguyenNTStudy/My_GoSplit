@@ -38,3 +38,11 @@ export function negotiateLocale(
     .sort((a, b) => b.q - a.q || a.index - b.index);
   return ranked.map((entry) => entry.language).find(isLocale) ?? DEFAULT_LOCALE;
 }
+
+/** A saved choice (account or cookie) wins; otherwise the browser's languages (R28). */
+export function resolveLocale(
+  saved: unknown,
+  acceptLanguage: string | null | undefined,
+): Locale {
+  return isLocale(saved) ? saved : negotiateLocale(acceptLanguage);
+}

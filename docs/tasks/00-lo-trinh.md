@@ -67,7 +67,8 @@ Cài từ npm công khai (`registry.npmjs.org`), như `package-lock.json`.
 | Thư viện | Phiên bản | Ghi chú |
 |---|---|---|
 | next-intl | 4.14 | Đã cài ở mục 5, chế độ không có i18n routing |
-| better-auth | 1.7 | Ghi hỗ trợ Next.js 16, React 19, Prisma 5–7; cài ở mục 8 |
+| better-auth | 1.7 | Ghi hỗ trợ Next.js 16, React 19, Prisma 5–7; cấu hình ở mục 8 với plugin username, không dùng admin plugin. Production cần `BETTER_AUTH_SECRET`, thiếu thì mọi trang đều lỗi; CI và E2E tạo secret ngẫu nhiên mỗi lần chạy |
+| argon2 (`crypto.argon2` của Node) | Node 24.7 trở lên | Hash passcode; có sẵn trong Node nên không cần thư viện |
 | PGlite | 0.5 | Postgres chạy trong bộ nhớ, có `pg_trgm` và `unaccent`; dùng để test migration khi chưa có Neon |
 | Prisma (CLI, client, adapter Neon) | 7.10.1 | Tag `latest` của CLI đang trỏ tới bản RC 8.0.0, nên ghim cả bộ ở 7.10.1; lên Prisma 8 khi có bản ổn định và Better Auth hỗ trợ. Prisma 7 cần driver adapter và đọc URL từ `prisma7.config.ts`, không từ schema |
 | shadcn/ui | CLI 4.23, Base UI 1.9 | Tailwind 4, React 19; dùng gói `cn` của shadcn thay cho clsx + tailwind-merge (gói mới, bản 0.5) |

@@ -1,9 +1,10 @@
-// Length rules for user-entered names (R73, R94). Text is counted in Unicode code points
+// Length rules for user-entered names (R73, R78, R94). Text is counted in Unicode code points
 // after NFC normalization, so `ệ` counts as one character whichever keyboard typed it;
 // this matches how Postgres counts VARCHAR(n).
 
 export const PLAN_NAME_MAX_LENGTH = 50;
 export const BASIC_DESCRIPTION_MAX_LENGTH = 100;
+export const DISPLAY_NAME_MAX_LENGTH = 40;
 
 export type TextError = "empty" | "too_long";
 
@@ -45,6 +46,16 @@ export function validateBasicDescription(
   const length = countChars(value);
   if (length === 0) return { ok: true, value: null };
   if (length > BASIC_DESCRIPTION_MAX_LENGTH)
+    return { ok: false, error: "too_long", length };
+  return { ok: true, value };
+}
+
+/** Account display name: 1–40 characters after trimming, need not be unique (R78). */
+export function validateDisplayName(raw: string): TextResult {
+  const value = normalizeInput(raw);
+  const length = countChars(value);
+  if (length === 0) return { ok: false, error: "empty", length };
+  if (length > DISPLAY_NAME_MAX_LENGTH)
     return { ok: false, error: "too_long", length };
   return { ok: true, value };
 }

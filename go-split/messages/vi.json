@@ -72,6 +72,15 @@
       "no_participants": "Chọn ít nhất một người.",
       "duplicate_participant": "Một người được chọn hai lần.",
       "nothing_to_record": "Chưa có số tiền nào để ghi."
+    },
+    "username": {
+      "too_short": "Username cần ít nhất {min} ký tự.",
+      "too_long": "Username tối đa {max} ký tự.",
+      "invalid_characters": "Chỉ dùng chữ thường không dấu, số, dấu chấm và gạch dưới."
+    },
+    "passcode": {
+      "invalid": "Passcode gồm đúng 6 chữ số.",
+      "weak": "Passcode này dễ đoán. Bạn vẫn dùng được, nhưng nên chọn số khác."
     }
   }
 }

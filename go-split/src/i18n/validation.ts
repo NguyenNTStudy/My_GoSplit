@@ -26,6 +26,8 @@ export const DOMAIN_ERRORS = {
   text: ["empty", "too_long"],
   planDates: ["invalid_date", "end_before_start", "too_long"],
   batch: ["no_participants", "duplicate_participant", "nothing_to_record"],
+  username: ["too_short", "too_long", "invalid_characters"],
+  passcode: ["invalid", "weak"],
 } as const;
 
 type DomainArea = keyof typeof DOMAIN_ERRORS;

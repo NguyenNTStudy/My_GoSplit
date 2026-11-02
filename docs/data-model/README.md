@@ -87,7 +87,7 @@ erDiagram
 - Thêm `areaSearch` (bản không dấu của khu vực) cho Stay, FoodGuide và ItineraryStay, và `destinationSearch` cho Itinerary (R34).
 - `token` của link mời → `tokenHash`; PlanInvite thêm `usedByAccountId` và `revokedAt`. PlanMember thêm `joinedVia`.
 - Thêm bảng EmailToken và GuideApplication; thêm `createdAt` cho Participant để giữ thứ tự hiển thị.
-- Account là bảng `User` của Better Auth (plugin username và admin): `displayName` là `name`, `isAdmin` là `role = admin`, `isBlocked` là `banned`. Bảng `Account` của Better Auth là các cách đăng nhập (Google, mật khẩu), không phải tài khoản người dùng.
+- Account là bảng `User` của Better Auth (plugin username): `displayName` là `name`, `isAdmin` là `role = admin`, `isBlocked` là `banned`. Các cột `role`, `banned`, `banReason`, `banExpires` (và `impersonatedBy` của Session) theo admin plugin của Better Auth, nhưng app không bật plugin này: khóa tài khoản ở plugin chặn cả đăng nhập, còn R44 chỉ chặn đăng, thả tim và báo cáo. Bảng `Account` của Better Auth là các cách đăng nhập (Google, mật khẩu), không phải tài khoản người dùng.
 - `userTag` bắt đầu bằng 4 chữ số; khi tag 4 chữ số trùng nhiều thì server cấp 5 chữ số trở lên, nên tag vẫn duy nhất mà không giới hạn số tài khoản (R37).
 
 ## Quy tắc xóa

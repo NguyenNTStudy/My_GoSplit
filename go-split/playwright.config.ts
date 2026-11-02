@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3000;
@@ -23,5 +25,12 @@ export default defineConfig({
     command: CI ? "npm run start" : "npm run dev",
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !CI,
+    // Better Auth refuses to start in production without a secret; a throwaway one per run
+    // is enough because test sessions never outlive the server.
+    env: {
+      BETTER_AUTH_SECRET:
+        process.env.BETTER_AUTH_SECRET ?? randomBytes(32).toString("base64"),
+      BETTER_AUTH_URL: `http://localhost:${PORT}`,
+    },
   },
 });

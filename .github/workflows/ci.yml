@@ -46,6 +46,8 @@ jobs:
           cache-dependency-path: go-split/package-lock.json
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      # Better Auth needs a secret in production builds; a random one per run, never stored.
+      - run: echo "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
       - run: npm run build
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v7

@@ -1,12 +1,18 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+
+import { auth } from "@/server/auth";
+import { getCurrentUser } from "@/server/session";
 
 import { LOCALE_COOKIE, isLocale } from "./config";
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
-/** Saves the language on this device (R28); the page re-renders in that language. */
+/**
+ * Saves the language on this device and, when signed in, on the account (R28); the page
+ * re-renders in that language.
+ */
 export async function setLocale(locale: string): Promise<void> {
   if (!isLocale(locale)) return;
   (await cookies()).set(LOCALE_COOKIE, locale, {
@@ -14,5 +20,10 @@ export async function setLocale(locale: string): Promise<void> {
     path: "/",
     sameSite: "lax",
   });
-  // TODO(task 5, after auth): also save it on the signed-in account.
+  if (await getCurrentUser()) {
+    await auth.api.updateUser({
+      body: { language: locale },
+      headers: await headers(),
+    });
+  }
 }

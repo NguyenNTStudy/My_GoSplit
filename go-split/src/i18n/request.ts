@@ -1,14 +1,22 @@
 import { cookies, headers } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
 
-import { LOCALE_COOKIE, isLocale, negotiateLocale } from "./config";
+import { getCurrentUser } from "@/server/session";
+
+import { LOCALE_COOKIE, isLocale, resolveLocale } from "./config";
 
 export default getRequestConfig(async () => {
-  // TODO(task 5, after auth): prefer the signed-in account's saved language over the cookie.
-  const saved = (await cookies()).get(LOCALE_COOKIE)?.value;
-  const locale = isLocale(saved)
-    ? saved
-    : negotiateLocale((await headers()).get("accept-language"));
+  const [user, cookieStore, headerStore] = await Promise.all([
+    getCurrentUser(),
+    cookies(),
+    headers(),
+  ]);
+  // The account's language wins on every device it signs in on, then this device's choice,
+  // then the browser (R28).
+  const saved = isLocale(user?.language)
+    ? user.language
+    : cookieStore.get(LOCALE_COOKIE)?.value;
+  const locale = resolveLocale(saved, headerStore.get("accept-language"));
 
   return {
     locale,

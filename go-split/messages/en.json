@@ -72,6 +72,15 @@
       "no_participants": "Select at least one person.",
       "duplicate_participant": "Someone is selected twice.",
       "nothing_to_record": "There's no amount to record yet."
+    },
+    "username": {
+      "too_short": "Use at least {min} characters.",
+      "too_long": "Use at most {max} characters.",
+      "invalid_characters": "Use lower-case letters without accents, digits, dots and underscores."
+    },
+    "passcode": {
+      "invalid": "The passcode is exactly 6 digits.",
+      "weak": "This passcode is easy to guess. You can still use it, but a different one is safer."
     }
   }
 }
