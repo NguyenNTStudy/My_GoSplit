@@ -40,7 +40,7 @@ Requirements, data model và wireframe (điện thoại và desktop) đã chốt
 - [x] Tạo `.env.example` theo bảng biến môi trường bên dưới.
 - [ ] Tạo Vercel project (Root Directory là `go-split`), biến môi trường, preview deploy cho mỗi PR.
 - [ ] Đưa token Gạo ấm vào CSS variables; font Lora và Be Vietnam Pro qua `next/font`.
-- [ ] Viết hàm chia chi phí đầu tiên kèm test (R16–R19) để chạy thử cả pipeline.
+- [x] Viết hàm chia chi phí đầu tiên kèm test (R16–R19) để chạy thử cả pipeline.
 
 ## Cấu trúc thư mục
 
@@ -72,7 +72,9 @@ Cài từ npm công khai (`registry.npmjs.org`), như `package-lock.json`.
 | shadcn/ui | CLI 4.23, Base UI 1.9 | Tailwind 4, React 19; dùng gói `cn` của shadcn thay cho clsx + tailwind-merge (gói mới, bản 0.5) |
 | Vitest | 5.0 | Cần Vite 8 (Rolldown) và `@types/node` từ 22 trở lên; dự án dùng `@types/node` 24 |
 | Playwright | 1.64 | Chỉ tải Chromium |
-| Zod, React Hook Form, `@hookform/resolvers`, decimal.js | 4.6, 7.91, 7.0, 10.6 | Hỗ trợ React 19 và Zod 4; cài ở task dùng tới |
+| decimal.js | 10.6 | Đã cài cho `src/domain` |
+| cldr-core | 49 | Dữ liệu tiền tệ theo vùng cho script sinh danh sách tiền tệ (devDependency) |
+| Zod, React Hook Form, `@hookform/resolvers` | 4.6, 7.91, 7.0 | Hỗ trợ React 19 và Zod 4; cài ở task dùng tới |
 
 Không thư viện nào trong danh sách thiếu hỗ trợ Next.js 16 hay React 19.3, nên chưa phải thay thư viện nào.
 

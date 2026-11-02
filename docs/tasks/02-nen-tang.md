@@ -81,25 +81,27 @@ Schema ở `go-split/prisma/schema.prisma`, migration đầu tiên ở `prisma/m
 
 ## 4. Logic nghiệp vụ (`src/domain`)
 
-- [ ] Chia chi phí theo tỷ lệ bằng decimal.js (R16, R17)
-- [ ] Validate số tiền > 0; tiền tệ không có phần lẻ chỉ nhận số nguyên, tiền tệ khác tối đa 3 chữ số thập phân; tỷ lệ > 0 (R14, R16, R18)
-- [ ] Tính cho từng người: chi tiêu, đã đóng (tiền đóng trừ trả lại, cộng khoản tự trả), còn thiếu hoặc dư; số người đã đủ; số tiền người thu tiền đang giữ (R76)
-- [ ] Làm tròn ở kết quả cuối theo bước làm tròn của tiền tệ (0,5; 1.000 với VND…): chi tiêu và còn thiếu làm tròn lên, dư làm tròn xuống; tổng sau làm tròn được phép lớn hơn tổng chi (R18, R19)
-- [ ] Danh sách tiền tệ: script sinh JSON từ ISO 4217 và CLDR (mã, tên tiếng Việt và tiếng Anh, ký hiệu, số chữ số lẻ, các nước dùng), cộng bảng bước làm tròn và nhóm phổ biến viết tay; commit file JSON để mọi trình duyệt thấy cùng một danh sách (R1, R19, R71)
-- [ ] Tìm tiền tệ theo mã, tên tiền tệ, tên nước và ký hiệu, dùng chung hàm chuẩn hóa không dấu với khu vực (R34, R71)
-- [ ] Chọn tiền tệ mặc định khi tạo plan: tiền tệ của plan tạo gần nhất, vùng của trình duyệt, rồi ngôn ngữ (R70)
-- [ ] Tiền đóng không tính vào chi tiêu; "Đã đóng đủ" và "Đã trả lại" ghi một khoản bằng đúng số còn thiếu hoặc số dư (R23)
-- [ ] Ghi tiền đóng hàng loạt: cùng số tiền hoặc mỗi người một số, mỗi người một khoản, chung `batchId`; không ghi khoản bằng không (R75)
-- [ ] Validate tên plan và tiêu đề hành trình: 1–50 ký tự sau khi bỏ khoảng trắng đầu cuối, đếm sau khi chuẩn hóa NFC (R73)
-- [ ] Chuẩn hóa khu vực để tìm kiếm: bỏ dấu, chữ thường, `đ` thành `d`, gộp khoảng trắng; dùng chung cho nơi ở, danh sách gợi ý và hành trình (R34)
-- [ ] Đếm số quán khác nhau trong danh sách gợi ý: so tên quán đã chuẩn hóa như khu vực (R35)
-- [ ] Nhận biết mục trùng với món đã có trong plan (cùng món, cùng quán) khi áp dụng danh sách gợi ý (R41)
-- [ ] Tạo hành trình từ plan đã chốt: đổi ngày thật thành số thứ tự ngày, bỏ hoạt động ở mục Ngày chưa xác định (R81), chỉ lấy các field được phép; tính số người và chi phí ước tính mỗi người, làm tròn như R19 (R64, R65)
-- [ ] Sao chép hành trình thành plan mới: đổi số thứ tự ngày thành ngày thật theo ngày bắt đầu, giữ giờ của hoạt động; ghi ItineraryCopy (R68)
-- [ ] Sao chép hoạt động đã chọn của hành trình vào plan đang có: Ngày N vào ngày thứ N của plan, giữ giờ (kể cả không có giờ); ngày vượt quá plan thì để trống ngày (mục Ngày chưa xác định); không thêm nơi ở; ghi ItineraryCopy nếu plan chưa có (R79, R81)
-- [ ] Thêm món ăn của hành trình vào plan: như áp dụng danh sách gợi ý, nhận biết món trùng (R41, R79)
-- [ ] Đổi ngày đi của plan: ngày về dời theo; nếu đồng ý thì dời hoạt động và nơi ở cùng số ngày, giữ giờ, hoạt động chưa có ngày giữ nguyên; khoản chi và tiền đóng giữ nguyên ngày (R80)
-- [ ] Unit test cho mọi edge case về tính tiền (cả tiền tệ có và không có phần lẻ, tiền đóng, trả lại, người tự trả khoản chi), chọn và tìm tiền tệ, chuẩn hóa khu vực, đếm quán, nhận biết mục trùng, tạo và sao chép hành trình
+TypeScript thuần, không phụ thuộc Next.js, React hay Prisma; mỗi file có test `*.test.ts` đặt tên theo mã rule. Hàm trả mã lỗi (chuỗi), chữ hiển thị do mục 5 dịch.
+
+- [x] Chia chi phí theo tỷ lệ bằng decimal.js (R16, R17): `expense-split.ts`, nhân trước rồi chia, không làm tròn
+- [x] Validate số tiền > 0; tiền tệ không có phần lẻ chỉ nhận số nguyên, tiền tệ khác tối đa 3 chữ số thập phân; tỷ lệ > 0 (R14, R16, R18): `amounts.ts`; giới hạn khớp cột database (11 chữ số phần nguyên, tỷ lệ 4 chữ số lẻ)
+- [x] Tính cho từng người: chi tiêu, đã đóng (tiền đóng trừ trả lại, cộng khoản tự trả), còn thiếu hoặc dư; số người đã đủ; số tiền người thu tiền đang giữ (R76): `summary.ts`; người dư tính là đã đủ; người thu tiền đang giữ = tổng tiền đóng trừ tiền trả lại
+- [x] Làm tròn ở kết quả cuối theo bước làm tròn của tiền tệ (0,5; 1.000 với VND…): chi tiêu và còn thiếu làm tròn lên, dư làm tròn xuống; tổng sau làm tròn được phép lớn hơn tổng chi (R18, R19): `rounding.ts`, `decimal.ts` (độ chính xác 50 chữ số); chi tiêu làm tròn lên trước, rồi thiếu hoặc dư tính trên số đã làm tròn, nên "Đã đóng đủ" luôn đưa người đó về đủ
+- [x] Danh sách tiền tệ: script sinh JSON từ ISO 4217 và CLDR (mã, tên tiếng Việt và tiếng Anh, ký hiệu, số chữ số lẻ, các nước dùng), cộng bảng bước làm tròn và nhóm phổ biến viết tay; commit file JSON để mọi trình duyệt thấy cùng một danh sách (R1, R19, R71): `scripts/generate-currencies.mjs` (`npm run currencies:generate`, dữ liệu `cldr-core`), ra `src/domain/currencies.json`, 153 tiền tệ đang dùng
+- [x] Tìm tiền tệ theo mã, tên tiền tệ, tên nước và ký hiệu, dùng chung hàm chuẩn hóa không dấu với khu vực (R34, R71): `currency.ts` (`searchCurrencies`, `currencyPickerSections`)
+- [x] Chọn tiền tệ mặc định khi tạo plan: tiền tệ của plan tạo gần nhất, vùng của trình duyệt, rồi ngôn ngữ (R70): `defaultCurrency` trong `currency.ts`
+- [x] Tiền đóng không tính vào chi tiêu; "Đã đóng đủ" và "Đã trả lại" ghi một khoản bằng đúng số còn thiếu hoặc số dư (R23): `settlementFor` trong `contributions.ts`
+- [x] Ghi tiền đóng hàng loạt: cùng số tiền hoặc mỗi người một số, mỗi người một khoản, chung `batchId`; không ghi khoản bằng không (R75): `buildContributionBatch` trong `contributions.ts`; `batchId` do server gán
+- [x] Validate tên plan và tiêu đề hành trình: 1–50 ký tự sau khi bỏ khoảng trắng đầu cuối, đếm sau khi chuẩn hóa NFC (R73): `text-rules.ts`, kèm mô tả ngắn của kế hoạch cơ bản tối đa 100 ký tự (R94)
+- [x] Chuẩn hóa khu vực để tìm kiếm: bỏ dấu, chữ thường, `đ` thành `d`, gộp khoảng trắng; dùng chung cho nơi ở, danh sách gợi ý và hành trình (R34): `search-text.ts`
+- [x] Đếm số quán khác nhau trong danh sách gợi ý: so tên quán đã chuẩn hóa như khu vực (R35): `food-match.ts`
+- [x] Nhận biết mục trùng với món đã có trong plan (cùng món, cùng quán) khi áp dụng danh sách gợi ý (R41): `food-match.ts`
+- [x] Tạo hành trình từ plan đã chốt: đổi ngày thật thành số thứ tự ngày, bỏ hoạt động ở mục Ngày chưa xác định (R81), chỉ lấy các field được phép; tính số người và chi phí ước tính mỗi người, làm tròn như R19 (R64, R65): `createItineraryDraft` trong `itinerary.ts`
+- [x] Sao chép hành trình thành plan mới: đổi số thứ tự ngày thành ngày thật theo ngày bắt đầu, giữ giờ của hoạt động; ghi ItineraryCopy (R68): `copyItineraryToNewPlan`; ghi ItineraryCopy do server làm
+- [x] Sao chép hoạt động đã chọn của hành trình vào plan đang có: Ngày N vào ngày thứ N của plan, giữ giờ (kể cả không có giờ); ngày vượt quá plan thì để trống ngày (mục Ngày chưa xác định); không thêm nơi ở; ghi ItineraryCopy nếu plan chưa có (R79, R81): `copyItineraryActivitiesToPlan`
+- [x] Thêm món ăn của hành trình vào plan: như áp dụng danh sách gợi ý, nhận biết món trùng (R41, R79): `prepareFoodsToAdd` trong `food-match.ts`
+- [x] Đổi ngày đi của plan: ngày về dời theo; nếu đồng ý thì dời hoạt động và nơi ở cùng số ngày, giữ giờ, hoạt động chưa có ngày giữ nguyên; khoản chi và tiền đóng giữ nguyên ngày (R80): `changePlanStartDate` trong `plan-dates.ts`; nơi ở ra ngoài khoảng ngày mới được trả về để bắt sửa trước khi lưu
+- [x] Unit test cho mọi edge case về tính tiền (cả tiền tệ có và không có phần lẻ, tiền đóng, trả lại, người tự trả khoản chi), chọn và tìm tiền tệ, chuẩn hóa khu vực, đếm quán, nhận biết mục trùng, tạo và sao chép hành trình (75 test, gồm ví dụ "Lẩu thứ 6" của wireframe và 100.000 ₫ chia 3 người)
 
 ## 5. Đa ngôn ngữ
 
