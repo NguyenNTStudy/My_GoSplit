@@ -5,7 +5,9 @@
   },
   "home": {
     "title": "Góp Gạo đang được xây dựng",
-    "body": "Sắp có: lên kế hoạch chuyến đi, chia tiền bữa ăn và tổng kết ai thiếu ai dư."
+    "body": "Sắp có: lên kế hoạch chuyến đi, chia tiền bữa ăn và tổng kết ai thiếu ai dư.",
+    "signedOutTitle": "Lên kế hoạch và chia tiền cùng bạn bè",
+    "signedOutBody": "Chuyến đi nhiều ngày hay một bữa ăn: ghi chi phí, xem ai thiếu ai dư, chốt tổng kết."
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -81,6 +83,9 @@
     "passcode": {
       "invalid": "Passcode gồm đúng 6 chữ số.",
       "weak": "Passcode này dễ đoán. Bạn vẫn dùng được, nhưng nên chọn số khác."
+    },
+    "currency": {
+      "unsupported": "Chọn một tiền tệ trong danh sách."
     }
   },
   "email": {
@@ -112,5 +117,113 @@
     "button": "Mở khóa",
     "done": "Đã mở khóa. Mọi người có thể nhập passcode lại.",
     "invalid": "Link đã được dùng hoặc đã hết hạn. Khóa tự hết sau 12 giờ."
+  },
+  "nav": {
+    "createPlan": "Tạo kế hoạch",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "account": "Tài khoản",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "yourPlans": "Kế hoạch của bạn"
+  },
+  "auth": {
+    "loginTitle": "Đăng nhập",
+    "loginIntro": "Đăng nhập để tạo và quản lý kế hoạch của bạn.",
+    "identifier": "Email hoặc username",
+    "password": "Mật khẩu",
+    "submit": "Đăng nhập",
+    "google": "Tiếp tục với Google",
+    "invalid": "Email, username hoặc mật khẩu không đúng.",
+    "notVerified": "Email chưa được xác nhận. Chúng tôi vừa gửi lại link xác nhận vào email của bạn.",
+    "failed": "Không đăng nhập được, thử lại sau."
+  },
+  "plans": {
+    "title": "Kế hoạch",
+    "filter": "Lọc kế hoạch",
+    "filterAll": "Tất cả",
+    "filterMine": "Tôi tạo",
+    "filterJoined": "Đang tham gia",
+    "upcoming": "Sắp diễn ra",
+    "finished": "Đã tổng kết",
+    "upcomingEmpty": "Chưa có kế hoạch nào sắp diễn ra.",
+    "finishedEmpty": "Chưa có kế hoạch nào đã tổng kết.",
+    "byStartDate": "Theo ngày đi",
+    "newestFirst": "Mới nhất ở trên",
+    "notSettled": "Chưa chốt tổng kết",
+    "basic": "Cơ bản",
+    "people": "{count} người",
+    "days": "{count} ngày",
+    "total": "Tổng chi",
+    "joinedEditor": "Đang tham gia · Sửa",
+    "joinedViewer": "Đang tham gia · Xem"
+  },
+  "createPlan": {
+    "title": "Tạo kế hoạch",
+    "chooseType": "Chọn loại kế hoạch",
+    "typeQuestion": "Bạn cần chia tiền cho việc gì?",
+    "basicName": "Cơ bản",
+    "basicDescription": "Chỉ chia tiền: người tham gia, khoản chi, tiền đóng và tổng kết. Hợp cho bữa ăn, buổi cafe, quà chung.",
+    "detailedName": "Kế hoạch chi tiết",
+    "detailedDescription": "Chuyến đi nhiều ngày: lịch trình, nơi ở, ăn gì và chia tiền; khám phá gợi ý, chia sẻ hành trình, chiêu mộ.",
+    "typeNote": "Không đổi được loại sau khi tạo.",
+    "tagSchedule": "Lịch trình",
+    "tagFood": "Ăn gì",
+    "tagCosts": "Chi phí",
+    "tagSummary": "Tổng kết",
+    "continue": "Tiếp tục",
+    "back": "Quay lại",
+    "create": "Tạo kế hoạch",
+    "progress": "Bước {step}/{total} · {name}",
+    "stepInfo": "Thông tin",
+    "stepTheme": "Theme",
+    "stepPasscode": "Passcode",
+    "name": "Tên kế hoạch",
+    "charsLeft": "Còn {count} ký tự",
+    "location": "Địa điểm",
+    "startDate": "Ngày đi",
+    "endDate": "Ngày về",
+    "dayCount": "{count} ngày · tối đa 60 ngày",
+    "currency": "Tiền tệ",
+    "participants": "Người tham gia · {count}",
+    "you": "(bạn)",
+    "addName": "Thêm tên",
+    "add": "Thêm",
+    "addLater": "Thêm sau trong kế hoạch cũng được.",
+    "removeName": "Bỏ {name}",
+    "description": "Mô tả ngắn",
+    "descriptionPlaceholder": "Ví dụ: quán lẩu bò đầu ngõ",
+    "optional": "(tùy chọn)",
+    "notes": "Ghi chú",
+    "notesPlaceholder": "Ví dụ: mang áo ấm, đặt xe trước",
+    "passcodeTitle": "Đặt passcode để chỉnh sửa",
+    "passcodeIntro": "Chỉ người có passcode mới sửa được.",
+    "passcodeLabel": "Passcode (6 số)",
+    "show": "Hiện",
+    "hide": "Ẩn",
+    "ownerTitle": "Bạn là chủ kế hoạch",
+    "ownerNote": "Bạn sửa được mà không cần passcode.",
+    "failed": "Không tạo được kế hoạch, thử lại sau."
+  },
+  "currencyPicker": {
+    "title": "Chọn tiền tệ",
+    "search": "Tìm theo mã, tên, nước hoặc ký hiệu",
+    "recent": "Bạn đã dùng gần đây",
+    "popular": "Phổ biến",
+    "all": "Tất cả",
+    "noResults": "Không tìm thấy tiền tệ phù hợp."
+  },
+  "plan": {
+    "notFoundTitle": "Không tìm thấy kế hoạch",
+    "notFoundBody": "Link không đúng hoặc đã được đổi. Hãy hỏi lại người gửi link cho bạn.",
+    "goHome": "Về trang chủ",
+    "tabs": "Các phần của kế hoạch",
+    "tabSchedule": "Lịch trình",
+    "tabFood": "Ăn gì",
+    "tabCosts": "Chi phí",
+    "tabSummary": "Tổng kết",
+    "basic": "Cơ bản",
+    "people": "{count} người",
+    "soon": "Phần này đang được làm."
   }
 }

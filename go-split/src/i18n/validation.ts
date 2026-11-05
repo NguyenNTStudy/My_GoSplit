@@ -28,6 +28,7 @@ export const DOMAIN_ERRORS = {
   batch: ["no_participants", "duplicate_participant", "nothing_to_record"],
   username: ["too_short", "too_long", "invalid_characters"],
   passcode: ["invalid", "weak"],
+  currency: ["unsupported"],
 } as const;
 
 type DomainArea = keyof typeof DOMAIN_ERRORS;

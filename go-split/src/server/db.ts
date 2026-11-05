@@ -1,6 +1,6 @@
 import "server-only";
 
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "./generated/prisma/client";
 import type { Sql } from "./sql";
@@ -11,8 +11,13 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
-    // Pooled connection for the app; migrations use DIRECT_URL (prisma7.config.ts).
-    adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
+    // Pooled connection for the app; migrations use DIRECT_URL (prisma7.config.ts). The same
+    // driver talks to Neon and to the local database (scripts/dev-db.mjs). DATABASE_POOL_MAX
+    // caps the pool when set.
+    adapter: new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+      max: Number(process.env.DATABASE_POOL_MAX) || undefined,
+    }),
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;

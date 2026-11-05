@@ -5,6 +5,9 @@ import { SiteHeader } from "@/components/layout/site-header";
 
 import { UnlockForm } from "./unlock-form";
 
+// Rendered per request for the visitor's session, so navigations here may wait.
+export const instant = false;
+
 // Opened from the unlock email sent to the plan owner (R9).
 export default async function UnlockPage({
   params,

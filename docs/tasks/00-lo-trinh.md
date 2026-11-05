@@ -69,8 +69,8 @@ Cài từ npm công khai (`registry.npmjs.org`), như `package-lock.json`.
 | next-intl | 4.14 | Đã cài ở mục 5, chế độ không có i18n routing |
 | better-auth | 1.7 | Ghi hỗ trợ Next.js 16, React 19, Prisma 5–7; cấu hình ở mục 8 với plugin username, không dùng admin plugin. Production cần `BETTER_AUTH_SECRET`, thiếu thì mọi trang đều lỗi; CI và E2E tạo secret ngẫu nhiên mỗi lần chạy |
 | argon2 (`crypto.argon2` của Node) | Node 24.7 trở lên | Hash passcode; có sẵn trong Node nên không cần thư viện |
-| PGlite | 0.5 | Postgres chạy trong bộ nhớ, có `pg_trgm` và `unaccent`; dùng để test migration khi chưa có Neon |
-| Prisma (CLI, client, adapter Neon) | 7.10.1 | Tag `latest` của CLI đang trỏ tới bản RC 8.0.0, nên ghim cả bộ ở 7.10.1; lên Prisma 8 khi có bản ổn định và Better Auth hỗ trợ. Prisma 7 cần driver adapter và đọc URL từ `prisma7.config.ts`, không từ schema |
+| PGlite, `pglite-socket` | 0.5, 0.2 | Postgres dạng WebAssembly, có `pg_trgm` và `unaccent`: test migration và câu SQL, database local cho dev và E2E (`npm run db:dev`). `pglite-socket` kéo theo 7 gói extension của PGlite qua peer dependency, chỉ ở devDependencies |
+| Prisma (CLI, client, `@prisma/adapter-pg`) | 7.10.1 | Tag `latest` của CLI đang trỏ tới bản RC 8.0.0, nên ghim cả bộ ở 7.10.1; lên Prisma 8 khi có bản ổn định và Better Auth hỗ trợ. Prisma 7 cần driver adapter và đọc URL từ `prisma7.config.ts`, không từ schema |
 | shadcn/ui | CLI 4.23, Base UI 1.9 | Tailwind 4, React 19; dùng gói `cn` của shadcn thay cho clsx + tailwind-merge (gói mới, bản 0.5) |
 | Vitest | 5.0 | Cần Vite 8 (Rolldown) và `@types/node` từ 22 trở lên; dự án dùng `@types/node` 24 |
 | Playwright | 1.64 | Chỉ tải Chromium |

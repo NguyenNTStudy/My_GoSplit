@@ -4,21 +4,23 @@ Tech stack và thứ tự làm: [README](README.md).
 
 ## 12. Kế hoạch (plan)
 
-- [ ] Màn chọn loại khi tạo kế hoạch: Cơ bản và Kế hoạch chi tiết, mỗi loại có mô tả, nhắc không đổi loại; chọn sẵn loại của kế hoạch tạo gần nhất (R93)
-- [ ] Tạo kế hoạch cơ bản hai bước: Thông tin (tên, tiền tệ, thêm nhanh tên người tham gia, mô tả ngắn tối đa 100 ký tự) và Passcode (R95)
-- [ ] Màn kế hoạch cơ bản: phần đầu gọn không có hình, mô tả ngắn dưới tên, nhãn Cơ bản; thẻ trong danh sách có mô tả ngắn một dòng; hai tab Chi phí và Tổng kết; đường dẫn tới tab không có thì về Chi phí; không có nút chia sẻ hành trình, chiêu mộ, theme, ảnh nền (R94)
-- [ ] Tạo plan: tên (1–50 ký tự, hiện số ký tự còn lại khi gần hết, R73), địa điểm, ngày bắt đầu/kết thúc, tiền tệ, ghi chú, theme, passcode (cần đăng nhập, R61); tiền tệ được chọn sẵn, hiện ký hiệu, mã và tên, đổi qua bộ chọn (R1, R70)
-- [ ] Bộ chọn tiền tệ: ô tìm theo mã, tên tiền tệ, tên nước, ký hiệu; khi chưa gõ thì hiện tiền tệ đã dùng gần đây, nhóm phổ biến, rồi toàn bộ theo chữ cái; tìm không ra thì giữ tiền tệ đang chọn (R71)
-- [ ] Đổi tiền tệ trong cài đặt plan khi chưa có khoản chi, tiền đóng và tổng kết đang mở; ngoài trường hợp đó thì khóa ô kèm lời giải thích (R72)
-- [ ] Không cho lưu khi ngày kết thúc trước ngày bắt đầu hoặc kế hoạch dài hơn 60 ngày; ô ngày về giới hạn 60 ngày kèm dòng nhắc; server kiểm tra lại (R2)
-- [ ] Danh sách plan của account chia hai mục: Sắp diễn ra (tổng kết `open` hoặc `locked`) ở trên, Đã tổng kết (`final`) ở dưới; Sắp diễn ra theo ngày bắt đầu tăng dần, Đã tổng kết theo ngày bắt đầu giảm dần; plan đã qua ngày kết thúc mà chưa chốt có nhãn "Chưa chốt tổng kết"; mục trống có thông báo ngắn; tên dài cắt ở 2 dòng (R60, R62, R73)
-- [ ] Danh sách plan gồm cả plan đang tham gia (nhãn "Đang tham gia" kèm quyền); bộ lọc Tất cả · Tôi tạo · Đang tham gia (R62, R84)
-- [ ] Trang xem plan qua link chia sẻ (cần đúng `planId` và khóa), không cần đăng nhập (R3)
+Chạy thử trên máy: `npm run db:dev` (database local, xem mục 2) rồi `npm run dev`; đăng nhập bằng tài khoản mẫu trong `scripts/seed.mjs`. E2E ở `tests/e2e/plans.spec.ts` chạy trên database mới cho mỗi lần.
+
+- [x] Màn chọn loại khi tạo kế hoạch: Cơ bản và Kế hoạch chi tiết, mỗi loại có mô tả, nhắc không đổi loại; chọn sẵn loại của kế hoạch tạo gần nhất (R93): `/plans/new` (`create-plan-wizard.tsx`); lần đầu chọn sẵn Cơ bản như wireframe
+- [x] Tạo kế hoạch cơ bản hai bước: Thông tin (tên, tiền tệ, thêm nhanh tên người tham gia, mô tả ngắn tối đa 100 ký tự) và Passcode (R95): kiểm tra bằng `validateNewPlan` (`src/domain/new-plan.ts`) ở cả form và server; tên trống bị bỏ, tên trùng tính một lần
+- [x] Màn kế hoạch cơ bản: phần đầu gọn không có hình, mô tả ngắn dưới tên, nhãn Cơ bản; thẻ trong danh sách có mô tả ngắn một dòng; hai tab Chi phí và Tổng kết; đường dẫn tới tab không có thì về Chi phí; không có nút chia sẻ hành trình, chiêu mộ, theme, ảnh nền (R94): nội dung từng tab làm ở mục 17, 18
+- [x] Tạo plan: tên (1–50 ký tự, hiện số ký tự còn lại khi gần hết, R73), địa điểm, ngày bắt đầu/kết thúc, tiền tệ, ghi chú, theme, passcode (cần đăng nhập, R61); tiền tệ được chọn sẵn, hiện ký hiệu, mã và tên, đổi qua bộ chọn (R1, R70): ba bước Thông tin, Theme, Passcode; hiện số ký tự còn lại khi còn từ 10 trở xuống; passcode dễ đoán có cảnh báo (R6); tạo plan, người tham gia của chủ plan và dòng `owner` trong một transaction (`createPlan` ở `src/server/plans.ts`)
+- [x] Bộ chọn tiền tệ: ô tìm theo mã, tên tiền tệ, tên nước, ký hiệu; khi chưa gõ thì hiện tiền tệ đã dùng gần đây, nhóm phổ biến, rồi toàn bộ theo chữ cái; tìm không ra thì giữ tiền tệ đang chọn (R71): `src/components/plan/currency-picker.tsx`; tiền tệ gần đây lấy từ các plan account đã tạo
+- [ ] Đổi tiền tệ trong cài đặt plan khi chưa có khoản chi, tiền đóng và tổng kết đang mở; ngoài trường hợp đó thì khóa ô kèm lời giải thích (R72): làm cùng màn cài đặt plan
+- [x] Không cho lưu khi ngày kết thúc trước ngày bắt đầu hoặc kế hoạch dài hơn 60 ngày; ô ngày về giới hạn 60 ngày kèm dòng nhắc; server kiểm tra lại (R2): ô ngày về giới hạn từ ngày đi tới 60 ngày, dòng nhắc "N ngày · tối đa 60 ngày"; database có CHECK cùng quy tắc
+- [x] Danh sách plan của account chia hai mục: Sắp diễn ra (tổng kết `open` hoặc `locked`) ở trên, Đã tổng kết (`final`) ở dưới; Sắp diễn ra theo ngày bắt đầu tăng dần, Đã tổng kết theo ngày bắt đầu giảm dần; plan đã qua ngày kết thúc mà chưa chốt có nhãn "Chưa chốt tổng kết"; mục trống có thông báo ngắn; tên dài cắt ở 2 dòng (R60, R62, R73): trang chủ khi đã đăng nhập; thứ tự và nhãn ở `src/domain/plan-list.ts` (có test); kế hoạch cơ bản xếp theo ngày tạo (R96)
+- [x] Danh sách plan gồm cả plan đang tham gia (nhãn "Đang tham gia" kèm quyền); bộ lọc Tất cả · Tôi tạo · Đang tham gia (R62, R84): bộ lọc nằm trong URL (`?filter=mine`, `?filter=joined`)
+- [x] Trang xem plan qua link chia sẻ (cần đúng `planId` và khóa), không cần đăng nhập (R3): `/p/{planId}/{shareKey}` với phần đầu theo theme (kế hoạch chi tiết) hoặc phần đầu gọn (cơ bản) và các tab; nội dung tab làm ở mục 14–18. Sai mã hay sai khóa đều ra cùng trang "Không tìm thấy kế hoạch". Ở bản production, trang này trả mã HTTP 200 thay vì 404: với Cache Components của Next.js 16, trang bắt đầu gửi về trước khi biết plan không có; nội dung vẫn giống hệt cho cả hai trường hợp và có `noindex`. Có thể chuyển phần kiểm tra lên `src/proxy.ts` nếu cần đúng mã 404
 - [ ] Đổi link chia sẻ (có xác nhận): link cũ hết dùng được; thiết bị đang có quyền chỉnh sửa và chủ account được chuyển sang link mới (R3)
 - [ ] Sửa thông tin plan
 - [ ] Đổi ngày đi: ngày về dời theo, hỏi dời hoạt động và nơi ở (mặc định có) (R80)
 - [ ] Xóa plan có hộp thoại xác nhận (R22)
-- [ ] Thẻ preview (Open Graph) khi gửi link qua Zalo/Messenger
+- [ ] Thẻ preview (Open Graph) khi gửi link qua Zalo/Messenger: tiêu đề trang đã là tên plan; ảnh preview làm sau (R51)
 - [ ] Tải lại dữ liệu khi người dùng quay lại tab, để đồng bộ giữa các thiết bị
 
 ## 13. Người tham gia

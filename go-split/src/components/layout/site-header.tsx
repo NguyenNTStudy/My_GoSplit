@@ -21,7 +21,10 @@ export async function SiteHeader({
   return (
     <header className={cn("md:border-b md:bg-card", className)}>
       <PageContainer className="flex h-14 items-center justify-between gap-3 md:h-16">
-        <Link href="/" className="font-heading text-2xl italic">
+        <Link
+          href="/"
+          className="font-heading text-2xl whitespace-nowrap italic"
+        >
           {t("name")}
         </Link>
         <div className="flex items-center gap-2">{children}</div>

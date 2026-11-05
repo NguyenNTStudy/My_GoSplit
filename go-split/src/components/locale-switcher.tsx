@@ -11,7 +11,7 @@ export async function LocaleSwitcher() {
     getTranslations("language"),
   ]);
   return (
-    <form role="group" aria-label={t("label")} className="flex gap-2">
+    <form role="group" aria-label={t("label")} className="flex gap-1 md:gap-2">
       {LOCALES.map((locale) => (
         <Button
           key={locale}
@@ -20,8 +20,11 @@ export async function LocaleSwitcher() {
           aria-pressed={locale === current}
           formAction={setLocale.bind(null, locale)}
           lang={locale}
+          aria-label={t(locale)}
         >
-          {t(locale)}
+          {/* Phones show the short code, as in the wireframes (VI, EN). */}
+          <span className="md:hidden">{locale.toUpperCase()}</span>
+          <span className="hidden md:inline">{t(locale)}</span>
         </Button>
       ))}
     </form>

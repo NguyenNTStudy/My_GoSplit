@@ -73,6 +73,11 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // shadcn's Label is a generic wrapper: callers pass `htmlFor`, which the rule can't see here.
+    files: ["src/components/ui/label.tsx"],
+    rules: { "jsx-a11y/label-has-associated-control": "off" },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([

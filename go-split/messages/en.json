@@ -5,7 +5,9 @@
   },
   "home": {
     "title": "GoSplit is under construction",
-    "body": "Coming soon: trip planning, splitting a meal, and a summary of who owes what."
+    "body": "Coming soon: trip planning, splitting a meal, and a summary of who owes what.",
+    "signedOutTitle": "Plan together, split costs fairly",
+    "signedOutBody": "A trip of many days or one dinner: record costs, see who owes what, settle up."
   },
   "language": {
     "label": "Language",
@@ -81,6 +83,9 @@
     "passcode": {
       "invalid": "The passcode is exactly 6 digits.",
       "weak": "This passcode is easy to guess. You can still use it, but a different one is safer."
+    },
+    "currency": {
+      "unsupported": "Choose a currency from the list."
     }
   },
   "email": {
@@ -112,5 +117,113 @@
     "button": "Unlock",
     "done": "Unlocked. People can enter the passcode again.",
     "invalid": "This link was already used or has expired. The lock ends by itself after 12 hours."
+  },
+  "nav": {
+    "createPlan": "New plan",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "account": "Account",
+    "back": "Back",
+    "close": "Close",
+    "yourPlans": "Your plans"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginIntro": "Sign in to create and manage your plans.",
+    "identifier": "Email or username",
+    "password": "Password",
+    "submit": "Sign in",
+    "google": "Continue with Google",
+    "invalid": "Wrong email, username or password.",
+    "notVerified": "Your email isn't confirmed yet. We just sent the confirmation link again.",
+    "failed": "Couldn't sign in. Please try again later."
+  },
+  "plans": {
+    "title": "Plans",
+    "filter": "Filter plans",
+    "filterAll": "All",
+    "filterMine": "Created by me",
+    "filterJoined": "Joined",
+    "upcoming": "Upcoming",
+    "finished": "Settled",
+    "upcomingEmpty": "No upcoming plans yet.",
+    "finishedEmpty": "No settled plans yet.",
+    "byStartDate": "By start date",
+    "newestFirst": "Newest first",
+    "notSettled": "Not settled yet",
+    "basic": "Basic",
+    "people": "{count} people",
+    "days": "{count} days",
+    "total": "Total spent",
+    "joinedEditor": "Joined · Can edit",
+    "joinedViewer": "Joined · Can view"
+  },
+  "createPlan": {
+    "title": "New plan",
+    "chooseType": "Choose a plan type",
+    "typeQuestion": "What are you splitting costs for?",
+    "basicName": "Basic",
+    "basicDescription": "Just splitting costs: people, expenses, contributions and the summary. Good for a meal, a coffee, a shared gift.",
+    "detailedName": "Detailed plan",
+    "detailedDescription": "A trip of several days: schedule, stays, food and costs; explore ideas, share your itinerary, find travel mates.",
+    "typeNote": "The type can't be changed after creating.",
+    "tagSchedule": "Schedule",
+    "tagFood": "Food",
+    "tagCosts": "Costs",
+    "tagSummary": "Summary",
+    "continue": "Continue",
+    "back": "Back",
+    "create": "Create plan",
+    "progress": "Step {step} of {total} · {name}",
+    "stepInfo": "Details",
+    "stepTheme": "Theme",
+    "stepPasscode": "Passcode",
+    "name": "Plan name",
+    "charsLeft": "{count} characters left",
+    "location": "Destination",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "dayCount": "{count} days · 60 at most",
+    "currency": "Currency",
+    "participants": "People · {count}",
+    "you": "(you)",
+    "addName": "Add a name",
+    "add": "Add",
+    "addLater": "You can add people later too.",
+    "removeName": "Remove {name}",
+    "description": "Short description",
+    "descriptionPlaceholder": "For example: the hotpot place down the alley",
+    "optional": "(optional)",
+    "notes": "Notes",
+    "notesPlaceholder": "For example: bring a jacket, book the car early",
+    "passcodeTitle": "Set a passcode for editing",
+    "passcodeIntro": "Only people with the passcode can edit.",
+    "passcodeLabel": "Passcode (6 digits)",
+    "show": "Show",
+    "hide": "Hide",
+    "ownerTitle": "You own this plan",
+    "ownerNote": "You can edit without the passcode.",
+    "failed": "Couldn't create the plan. Please try again later."
+  },
+  "currencyPicker": {
+    "title": "Choose a currency",
+    "search": "Search by code, name, country or symbol",
+    "recent": "Recently used",
+    "popular": "Popular",
+    "all": "All",
+    "noResults": "No matching currency."
+  },
+  "plan": {
+    "notFoundTitle": "Plan not found",
+    "notFoundBody": "The link is wrong or has been changed. Ask the person who sent it for the new one.",
+    "goHome": "Go to the home page",
+    "tabs": "Plan sections",
+    "tabSchedule": "Schedule",
+    "tabFood": "Food",
+    "tabCosts": "Costs",
+    "tabSummary": "Summary",
+    "basic": "Basic",
+    "people": "{count} people",
+    "soon": "This part is being built."
   }
 }
